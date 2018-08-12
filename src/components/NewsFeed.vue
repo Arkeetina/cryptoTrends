@@ -1,14 +1,32 @@
 <template>
   <div class="newsfeed-container">
-    <div v-for="article in articlesData" :key="article.articleId">
-      <img src="article.urlToImage" />
-      <div>
-        <p>
-          <a href="article.url">{{ article.title }}</a>
-          <span>{{ article.source.name }}</span>
-        </p>
-        <p>{{ article.description }}</p>
+    <div v-if="articlesData.length">
+      <div
+        v-for="article in articlesData"
+        :key="article._id"
+      >
+        <div>
+          <img
+            :src="article.originalImageUrl"
+            width="100px"
+            height="100px"
+          >
+          <div>
+            <a
+              :href="article.url"
+              target="_blank"
+            >{{ article.title }}</a>
+            <p>{{ article.source.name }}</p>
+          </div>
+          <p>{{ article.description }}</p>
+        </div>
       </div>
+    </div>
+
+    <div
+      v-if="!articlesData.length"
+    >
+      <p>No headlines availble</p>
     </div>
   </div>
 </template>
@@ -17,32 +35,37 @@
 
 import uniqueId from 'lodash.uniqueid'
 
+import api from '../api/api'
+
 export default {
   name: 'NewsFeed',
+  props: {
+    cryptocur: { type: String, required: true },
+  },
   data() {
     return {
       totalArticlesCount: '',
       articlesData: [],
     }
   },
+  created() {
+    this.fetchArticles();
+  },
   methods: {
-    addId (articlesArr) {
-      const articlesArrWithId = articlesArr.map(article => {
-        return {...article, articleId: uniqueId('news-id')};
-      });
-      return articlesArrWithId;
-    }
-  }
+    async fetchArticles() {
+      try {
+        const articlesData = await api.coinNewsApi.getTopNewsByCoin(this.cryptocur, 'en');
+        // add a check for array length
+        this.articlesData = articlesData.slice(0, 9)
+      } catch(e) {
+        console.log(e);
+      }
+    },
+  },
+
 }
 </script>
 
-<style>
-#app {
-  font-family: 'Avenir', Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}
+<style lang="scss">
+
 </style>

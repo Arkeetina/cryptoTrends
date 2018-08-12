@@ -8,7 +8,7 @@ module.exports = {
     browser: true
   },
   extends: [
-    'recommended'
+    'plugin:vue/recommended'
   ],
   plugins: [
     'vue'

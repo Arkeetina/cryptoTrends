@@ -8,14 +8,14 @@
 import Main from './components/Main'
 
 export default {
-  name: 'app',
+  name: 'App',
   components: {
     Main
   }
 }
 </script>
 
-<style>
+<style ang="scss">
 #app {
   font-family: 'Avenir', Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;

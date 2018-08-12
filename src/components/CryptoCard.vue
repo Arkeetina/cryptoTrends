@@ -8,11 +8,16 @@
 
     <div class="icon-container">
       <span>{{ rank }}</span>
-      <img class="icon-coin" src="" />
+      <img
+        class="icon-coin"
+        width= "240px"
+        height="320px"
+        src=""
+      >
     </div>
 
     <div class="price-info-container">
-      <div class="chart"></div>
+      <div class="chart">I am not empty</div>
       <div class="rate-information">
         <div class="rate">
           <p class="sub-title">Rate</p>
@@ -31,8 +36,13 @@
 
     <div class="headlines-container">
       <p class="sub-title">Latest headlines...</p>
+
       <div class="headlines">
+        <NewsFeed
+          :cryptocur="cryptocur"
+        />
       </div>
+
     </div>
 
   </div>
@@ -40,8 +50,17 @@
 
 <script>
 
+import api from '../api/api'
+import NewsFeed from './NewsFeed'
+
 export default {
   name: 'CryptoCard',
+  components: {
+    NewsFeed
+  },
+  props: {
+    cryptocur: { type: String, required: true },
+  },
   data() {
     return {
       name: '',
@@ -55,13 +74,9 @@ export default {
 }
 </script>
 
-<style>
-#app {
-  font-family: 'Avenir', Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
+<style lang="scss">
+.crypto-card-container {
+  border: solid 1px #000;
+  border-radius: 3px;
 }
 </style>
