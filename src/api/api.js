@@ -11,7 +11,6 @@ export default {
         return data;
       }
   
-      if (res.status === 403) return { error: 'Not authorized' };
       return { error: res.message || 'There was an error, please try again later' };
     } catch (e) {
       if (n === 1) return { error: NETWORK_ERROR_MESSAGE };
