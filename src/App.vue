@@ -51,6 +51,12 @@ body {
   grid-template-columns: 1fr 1fr;
 }
 
+@media  (max-width: 650px) {
+  .coins-list-section {
+    grid-template-columns: 1fr;
+  }
+}
+
 .pink-card {
   background-color: lightpink;
 }

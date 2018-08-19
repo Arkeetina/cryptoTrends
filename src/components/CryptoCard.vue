@@ -13,7 +13,11 @@
     </div>
 
     <div class="price-info-container">
-      <div class="crypto-chart">Not empty</div>
+      <img
+        :src="logSrc"
+        width="115px"
+        height="115px"
+      >
       <div
         class="rate-information"
         style="margin-left: 15px; padding: 12px 0;"
@@ -29,8 +33,9 @@
       </div>
     </div>
 
-    <div class="about-coin-containet">
-      <p> {{ coinData.aboutCoin }} </p>
+    <div class="about-coin-container">
+      <p v-if="!aboutCoin"> Loading </p>
+      <p v-if="aboutCoin"> {{ aboutCoin }} </p>
     </div>
 
     <div class="headlines-container">
@@ -53,11 +58,22 @@
 </template>
 
 <style lang="scss">
+@media  (max-width:650px) {
+  .crypto-card-container {
+    min-width: 100%;
+  }
+}
 .crypto-card-container {
-  height: 470px;
+  height: 580px;
+  min-width: 274px;;
   overflow-y: visible;
   padding: 30px;
 }
+
+.about-coin-container {
+  font-size: 14px;
+}
+
 .crypto-title {
   font-weight: 500;
   font-size: 24px;
@@ -109,9 +125,18 @@ export default {
     coinid: { type: String, required: true },
     cardcolor: { type: String, required: true },
   },
+  data() {
+    return {
+      aboutCoin: '',
+    }
+  },
   computed: {
+    logSrc() {
+      return `https://s2.coinmarketcap.com/static/img/coins/128x128/${this.coinid}.png`
+    },
     coinData() {
       const data = { ...this.cryptosdatalist[this.coinid] }
+      if (this.cryptosdatalist[this.coinid].name === "XRP") data.name = "Ripple"
       return data
     },
     cardClass() {
@@ -119,10 +144,25 @@ export default {
     },
   },
   created() {
-  },
-  created() {
+    this.fetchWikiExtract()
   },
   methods: {
+    setURI() {
+      if (this.cryptocur === "XRP") return encodeURIComponent('Ripple (payment protocol)')
+      return encodeURIComponent(this.cryptocur)
+    },
+    async fetchWikiExtract() {
+      try {
+        const url = `https://en.wikipedia.org/w/api.php?format=json&action=query&prop=extracts&exsentences=10&titles=${this.setURI()}&origin=*`
+        const options = { method: 'GET' }
+        const articleExtract = await api.startFetchJsonData(url, options, 3)
+        const keyId = Object.keys(articleExtract.query.pages)[0]
+        const extractString = articleExtract.query.pages[keyId].extract.replace(/<(.|\n)*?>/g, '')
+        this.aboutCoin = `${extractString.split('.').slice(0, 3).join('. ')}.`
+      } catch(e) {
+        console.log(e)
+      }
+    },
   },
 }
 </script>
