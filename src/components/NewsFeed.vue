@@ -28,9 +28,15 @@
     </div>
 
     <div
-      v-if="!articlesData.length"
+      v-if="!articlesData.length && !loadingArticles"
     >
       <p>No headlines availble</p>
+    </div>
+
+    <div
+      v-if="loadingArticles"
+    >
+      <p>Loading articles...</p>
     </div>
   </div>
 </template>
@@ -48,6 +54,7 @@ export default {
     return {
       totalArticlesCount: '',
       articlesData: [],
+      loadingArticles: true,
     }
   },
   computed: {
@@ -66,12 +73,13 @@ export default {
     },
     async fetchArticles() {
       try {
-        
         const setCoinQueryName = this.cryptocurName.toLowerCase().split(' ').join('-')
-        const articlesData = await api.coinNewsApi.getTopNewsByCoin(setCoinQueryName, 'en');
+        const articlesData = await api.coinNewsApi.getTopNewsByCoin(setCoinQueryName, 'en')
+        this.loadingArticles = false
         // add a check for array length
         this.articlesData = articlesData.slice(0, this.setArrLength(articlesData))
       } catch(e) {
+        this.loadingArticles = false
         console.log(e);
       }
     },
@@ -86,7 +94,7 @@ export default {
 }
 .news-top-section {
   display: flex;
-  height: 70px;
+  min-height: 70px;
 }
 .news-source-name {
   margin: 0;
