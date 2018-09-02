@@ -1,65 +1,68 @@
 <template>
   <div id="app">
     <div
-      v-if="!isCryptoInfoFetched"
+      v-if="isCryptoInfoLoading"
       class="loader-container"
     >
       <img src="./assets/loader.svg">
     </div>
-
+    <Header
+      v-if="!isCryptoInfoLoading"
+      @flipallcoins="flipAllCoins"
+    />
     <div
-      v-if="isCryptoInfoFetched"
+      v-if="!isCryptoInfoLoading"
       class="coins-list-section"
     >
       <CryptoCard
-        :cryptosdatalist="cryptosdatalist"
-        :showbackside="true"
-        coinid="1"
-        cryptocur="bitcoin"
-        cardcolor="yellow-card"
-      />
-      <CryptoCard
-        :cryptosdatalist="cryptosdatalist"
-        :showbackside="false"
-        coinid="1027"
-        cryptocur="ethereum"
-        cardcolor="green-card"
-      />
-      <CryptoCard
-        :cryptosdatalist="cryptosdatalist"
-        :showbackside="true"
-        coinid="52"
+        v-for="cryptoCoin in cryptocomparedatalist"
+        :updatecard="updatecard"
+        :key="cryptoCoin.coinid"
+        :logosrc="cryptoCoin.imgurl"
+        :showbackside="cryptoCoin.showbackside"
+        :coinid="cryptoCoin.coinid"
+        :symbol="cryptoCoin.symbol"
+        :coinname="cryptoCoin.name"
         cardcolor="blue-card"
-        cryptocur="XRP"
-      />
-      <CryptoCard
-        :cryptosdatalist="cryptosdatalist"
-        :showbackside="false"
-        coinid="1831"
-        cardcolor="pink-card"
-        cryptocur="Bitcoin Cash"
-      />
-      <CryptoCard
-        :cryptosdatalist="cryptosdatalist"
-        :showbackside="false"
-        coinid="1567"
-        cardcolor="pink-card"
-        cryptocur="Nano"
-      />
-      <CryptoCard
-        :cryptosdatalist="cryptosdatalist"
-        :showbackside="true"
-        coinid="1697"
-        cardcolor="pink-card"
-        cryptocur="Basic Attention Token"
       />
     </div>
+    <div
+      v-if="!isCryptoInfoLoading"
+      class="load-more-button-container"
+    >
+      <div v-if="showButtonLoader">
+        Loading
+      </div>
+      <div
+        v-if="!showButtonLoader"
+        class="load-more"
+        @click="loadMoreCoins()"
+      >
+        Load next 10 coins
+      </div>
+    </div>
+    <Footer v-if="!isCryptoInfoLoading" />
+
   </div>
 </template>
 
 <style lang="scss">
 body {
   margin: 0
+}
+
+.load-more {
+  border: 0;
+  font-weight: 300;
+  font-size: 18px;
+}
+
+.load-more:hover {
+  cursor: pointer;
+}
+
+.load-more-button-container {
+  text-align: center;
 }
 
 .loader-container {
@@ -76,8 +79,11 @@ body {
 }
 
 .coins-list-section {
+  margin-top: 50px;
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-gap: 8px;
+  padding: 8px;
 }
 
 @media  (max-width: 650px) {
@@ -86,51 +92,93 @@ body {
   }
 }
 
-.pink-card {
-  background-color: lightpink;
-}
 .blue-card {
-  background-color: lightblue;
-}
-.green-card {
-  background-color: lightgreen;
-}
-
-.yellow-card {
-  background-color: lightyellow;
+  border: 1px dashed lightblue;
 }
 </style>
 
 <script>
 import CryptoCard from './components/CryptoCard.vue'
+import Header from './components/Header'
+import Footer from './components/Footer'
 import api from './api/api'
+
+const cryptoComparaBaseUrl = 'https://cryptocompare.com'
 
 export default {
   name: 'App',
   components: {
-    CryptoCard
+    CryptoCard,
+    Header,
+    Footer,
   },
   data() {
     return {
-      isCryptoInfoFetched: false,
-      cryptosdatalist: {},
+      isCryptoInfoLoading: true,
+      showButtonLoader: false,
+      cryptocomparedatalist: [],
+      pageNumb: 0,
+      updatecard: false,
     }
   },
   created() {
     this.loadCryptoData()
   },
   methods: {
+    async flipAllCoins() {
+      this.cryptocomparedatalist = this.cryptocomparedatalist.map(coin => {
+          const coinObj = {
+            ...coin,
+            showbackside: true,
+          }
+          return coinObj
+      });
+      this.updatecard = true;
+      await this.$nextTick()
+      this.updatecard = false;
+      this.cryptocomparedatalist = this.cryptocomparedatalist.map(coin => {
+          const coinObj = {
+            ...coin,
+            showbackside: false,
+          }
+          return coinObj
+      });
+    },
+
+    async loadMoreCoins() {
+      this.pageNumb = this.pageNumb + 1
+      this.showButtonLoader = true;
+      await this.loadCryptoData()
+      this.showButtonLoader = false;
+    },
+
     async loadCryptoData() {
       try {
-        const options = {
-          method: 'GET',
-          sort: 'id'
-        };
-        const url = 'https://api.coinmarketcap.com/v2/ticker/';
-        const cryptosDataList = await api.startFetchJsonData(url, options, 3);
-        this.cryptosdatalist = { ...cryptosDataList.data };
-        this.isCryptoInfoFetched = !this.isCryptoInfoFetched;
+        // this.isCryptoInfoLoading = true
+        const options = { method: 'GET' }
+        const cryptoCompareUrl = `https://min-api.cryptocompare.com/data/top/totalvol?limit=10&tsym=USD&page=${this.pageNumb}`
+        const coinlist = await api.startFetchJsonData(cryptoCompareUrl, options, 3)
+        
+        const newData= coinlist.Data.map(coin => {
+          const coinObj = {
+            coinid: coin.CoinInfo.Id,
+            symbol: coin.CoinInfo.Name,
+            name: coin.CoinInfo.FullName,
+            imgurl: `${cryptoComparaBaseUrl}${coin.CoinInfo.ImageUrl}`,
+            showbackside: false,
+          }
+          return coinObj
+        })
+        if (this.cryptocomparedatalist.length) {
+          this.cryptocomparedatalist = [...this.cryptocomparedatalist, ...newData]
+        } else {
+          this.cryptocomparedatalist = newData
+        }
+
+        
+        this.isCryptoInfoLoading = false;
       } catch(e) {
+        this.isCryptoInfoLoading = false;
         console.log(e)
       }
     }

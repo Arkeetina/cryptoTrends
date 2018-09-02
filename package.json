@@ -8,8 +8,9 @@
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
-    "animate.css": "^3.7.0",
+    "axios": "^0.18.0",
     "crypto-news-api": "^2.2.0",
+    "cryptocompare": "^0.5.0",
     "vue": "^2.5.16"
   },
   "devDependencies": {

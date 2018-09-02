@@ -10,7 +10,7 @@
         @click="flipCard()"
       >
         <img
-          :src="logSrc"
+          :src="logosrc"
           width="128px"
           height="128px"
         >
@@ -18,7 +18,7 @@
           class="crypto-title"
           style="padding: 0 25px;"
         >
-          {{ coinData.name }}
+          {{ coinname }}
         </p>
       </div>
     </transition>
@@ -33,18 +33,14 @@
       >
         <div class="top-section">
           <div class="name-container">
-            <span class="crypto-title">{{ coinData.name }}</span>
-            <span style="margin-left: 5px">({{ coinData.symbol }})</span>
-          </div>
-
-          <div class="icon-container">
-            <p>Rank: #{{ coinData.rank }}</p>
+            <span class="crypto-title">{{ coinname }}</span>
+            <span style="margin-left: 5px">({{ symbol }})</span>
           </div>
         </div>
 
         <div class="price-info-container">
           <img
-            :src="logSrc"
+            :src="logosrc"
             width="115px"
             height="115px"
             class="crypto-logo"
@@ -54,20 +50,49 @@
             class="rate-information"
             style="margin-left: 15px; padding: 12px 0;"
           >
+
             <div class="rate">
               <p class="sub-title">Rate</p>
-              <p class="info-title"> {{ coinData.quotes.USD.price }} </p>
+              <p
+                v-if="showPriceLoader"
+                class="info-title"
+              >
+                Loading
+              </p>
+              <p
+                v-if="!showPriceLoader"
+                class="info-title"
+              > {{ coinPriceData.price }}
+              </p>
             </div>
             <div class="marketcap">
               <p class="sub-title">Market Cap</p>
-              <p class="info-title"> {{ coinData.quotes.USD.market_cap }} </p>
+              <p
+                v-if="showPriceLoader"
+                class="info-title"
+              >
+                Loading 
+              </p>
+              <p
+                v-if="!showPriceLoader"
+                class="info-title"
+              >
+                {{ coinPriceData.marketcap }}
+              </p>
             </div>
+            <!-- <div class="marketcap">
+              <p class="sub-title">Website</p>
+              <p class="info-title">
+                <a :href="coinDescription.websiteUrl">{{ coinname }}</a>
+              </p>
+            </div> -->
+
           </div>
         </div>
 
         <!-- <div class="about-coin-container">
-          <p v-if="!aboutCoin"> Loading </p>
-          <p v-if="aboutCoin"> {{ aboutCoin }} </p>
+          <p v-if="!coinDescription.description"> Loading </p>
+          <p v-if="coinDescription.description"> {{ coinDescription.description }} </p>
         </div> -->
 
         <div class="headlines-container">
@@ -80,7 +105,7 @@
 
           <div class="headlines">
             <NewsFeed
-              :cryptocur="coinData.name"
+              :cryptocur="coinname"
             />
           </div>
 
@@ -106,7 +131,15 @@
   overflow-y: visible;
   padding: 30px;
   display: flex;
+  background-color: #fff;
+}
+
+.justify-center {
   justify-content: center
+}
+
+.justify-start {
+  justify-content: flex-start;
 }
 
 .backside-icon-container {
@@ -162,10 +195,10 @@
 
 <script>
 
+import cryptocompare from 'cryptocompare'
+import axios from 'axios'
 import api from '../api/api'
 import NewsFeed from './NewsFeed'
-
-const COINMARKETCAP_ROOT_URL = 'https://api.coinmarketcap.com/v1/ticker/?convert=USD&limit=10';
 
 
 export default {
@@ -174,50 +207,84 @@ export default {
     NewsFeed
   },
   props: {
-    cryptosdatalist: { type: Object, required: true },
-    cryptocur: { type: String, required: true },
+    coinname: { type: String, required: true },
     coinid: { type: String, required: true },
+    logosrc: { type: String, required: true },
+    symbol: { type: String, required: true },
     cardcolor: { type: String, required: true },
     showbackside: { type: Boolean, required: true },
+    updatecard: { type: Boolean, required: true },
   },
   data() {
     return {
-      aboutCoin: '',
-      showBackside: this.showbackside,
+      // coinDescription: {
+      //   description: '',
+      //   websiteUrl: '',
+      // },
+      coinPriceData: {
+        marketcap: '',
+        price: '',
+      },
+      showPriceLoader: false,
     }
   },
   computed: {
-    logSrc() {
-      return `https://s2.coinmarketcap.com/static/img/coins/128x128/${this.coinid}.png`
-    },
-    coinData() {
-      const data = { ...this.cryptosdatalist[this.coinid] }
-      if (this.cryptosdatalist[this.coinid].name === "XRP") data.name = "Ripple"
-      return data
-    },
     cardClass() {
-      return `crypto-card-container ${this.cardcolor}`
+      if (this.showBackside) return `crypto-card-container justify-center ${this.cardcolor}`
+      return `crypto-card-container justify-start ${this.cardcolor}`
     },
+    showBackside() {
+      return this.showbackside;
+    }
+  },
+  watch: { 
+    updatecard: function(newVal, oldVal) { // watch it
+      if (newVal === true) {
+        this.showPriceLoader = true
+        this.fetchCoinInformation()
+      } else {
+        this.showPriceLoader = false
+      }
+    }
   },
   created() {
-    this.fetchWikiExtract()
+    this.fetchCoinInformation()
+    debugger
   },
+
+  // async beforeUpdate() {
+  //   if (this.updatecard === true) {
+  //     // this.showPriceLoader = true
+  //     this.fetchCoinInformation()
+  //     // this.showPriceLoader = false
+  //   }
+
+  // },
   methods: {
     flipCard() {
       this.showBackside = !this.showBackside
+      if (this.showBackside === false) this.fetchCoinInformation()
     },
-    setURI() {
-      if (this.cryptocur === "XRP") return encodeURIComponent('Ripple (payment protocol)')
-      return encodeURIComponent(this.cryptocur)
-    },
-    async fetchWikiExtract() {
+    async fetchCoinInformation() {
       try {
-        const url = `https://en.wikipedia.org/w/api.php?format=json&action=query&prop=extracts&exsentences=10&titles=${this.setURI()}&origin=*`
-        const options = { method: 'GET' }
-        const articleExtract = await api.startFetchJsonData(url, options, 3)
-        const keyId = Object.keys(articleExtract.query.pages)[0]
-        const extractString = articleExtract.query.pages[keyId].extract.replace(/<(.|\n)*?>/g, '')
-        this.aboutCoin = `${extractString.split('. ').slice(0, 3).join('. ')}.`
+        // const urlDescription = `https://www.cryptocompare.com/api/data/coinsnapshotfullbyid/?id=${this.coinid}`
+        const options = { method: 'GET' };
+        // const snapshot = await axios.get(urlDescription)
+        const url = `https://min-api.cryptocompare.com/data/pricemultifull?fsyms=${this.symbol}&tsyms=USD`
+        const priceData = await api.startFetchJsonData(url, options, 3)
+
+        // this.coinDescription = {
+        //   ...this.coinDescription,
+        //   description: snapshot.Data.General.Description,
+        //   websiteUrl: snapshot.Data.General.WebsiteUrl,
+        // }
+
+        this.coinPriceData = {
+          ...this.coinPriceData,
+          marketcap: priceData.DISPLAY[this.symbol].USD.MKTCAP,
+          price: priceData.DISPLAY[this.symbol].USD.PRICE,
+        }
+
       } catch(e) {
         console.log(e)
       }
