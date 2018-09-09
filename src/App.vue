@@ -23,7 +23,7 @@
         :coinid="cryptoCoin.coinid"
         :symbol="cryptoCoin.symbol"
         :coinname="cryptoCoin.name"
-        cardcolor="blue-card"
+        :cardcolor="cryptoCoin.cardcolor"
       />
     </div>
     <div
@@ -81,9 +81,15 @@ body {
 .coins-list-section {
   margin-top: 50px;
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  grid-gap: 8px;
-  padding: 8px;
+  grid-template-columns: 1fr 1fr;
+}
+
+.dark-purple {
+  background-color: #413e7e;
+}
+
+.light-purple {
+  background-color: #726cda;
 }
 
 @media  (max-width: 650px) {
@@ -145,27 +151,34 @@ export default {
       });
     },
 
+    setCardBackgroundColor(index) {
+      if (((index / 3) + index) % 2 === 0) {
+        return "dark-purple"
+      } 
+      return "light-purple"
+    },
+
     async loadMoreCoins() {
       this.pageNumb = this.pageNumb + 1
-      this.showButtonLoader = true;
+      this.showButtonLoader = true
       await this.loadCryptoData()
-      this.showButtonLoader = false;
+      this.showButtonLoader = false
     },
 
     async loadCryptoData() {
       try {
-        // this.isCryptoInfoLoading = true
         const options = { method: 'GET' }
         const cryptoCompareUrl = `https://min-api.cryptocompare.com/data/top/totalvol?limit=10&tsym=USD&page=${this.pageNumb}`
         const coinlist = await api.startFetchJsonData(cryptoCompareUrl, options, 3)
         
-        const newData= coinlist.Data.map(coin => {
+        const newData= coinlist.Data.map((coin, index) => {
           const coinObj = {
             coinid: coin.CoinInfo.Id,
             symbol: coin.CoinInfo.Name,
             name: coin.CoinInfo.FullName,
             imgurl: `${cryptoComparaBaseUrl}${coin.CoinInfo.ImageUrl}`,
             showbackside: false,
+            cardcolor: this.setCardBackgroundColor(index),
           }
           return coinObj
         })
@@ -176,9 +189,9 @@ export default {
         }
 
         
-        this.isCryptoInfoLoading = false;
+        this.isCryptoInfoLoading = false
       } catch(e) {
-        this.isCryptoInfoLoading = false;
+        this.isCryptoInfoLoading = false
         console.log(e)
       }
     }

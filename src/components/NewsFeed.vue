@@ -18,6 +18,7 @@
               <a
                 :href="article.url"
                 target="_blank"
+                class="newsfeed-link"
               >{{ article.title }}</a>
               <p class="news-source-name">{{ article.source.name }}</p>
             </div>
@@ -89,8 +90,17 @@ export default {
 </script>
 
 <style lang="scss">
+
 .news-img-container {
   padding: 5px;
+}
+.newsfeed-link {
+  text-decoration: none;
+  font-weight: 500;
+  color: #413e7e;
+}
+.newsfeed-link:hover {
+  text-decoration: underline;
 }
 .news-top-section {
   display: flex;
@@ -102,12 +112,13 @@ export default {
 }
 .news-row-section {
   font-size: 14px;
+  margin-top: 10px;
 }
 .news-source-container {
   padding: 5px;
 }
 .newsfeed-container {
-  margin: 10px;
+  margin: 10px 10px 0 10px;
   overflow-y: scroll;
   height: 250px;
 }

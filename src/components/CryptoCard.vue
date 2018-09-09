@@ -18,7 +18,7 @@
           class="crypto-title"
           style="padding: 0 25px;"
         >
-          {{ coinname }}
+          {{ coinname.toUpperCase() }}
         </p>
       </div>
     </transition>
@@ -32,77 +32,36 @@
         class="card-main-section"
       >
         <div class="top-section">
-          <div class="name-container">
-            <span class="crypto-title">{{ coinname }}</span>
-            <span style="margin-left: 5px">({{ symbol }})</span>
-          </div>
-        </div>
-
-        <div class="price-info-container">
-          <img
-            :src="logosrc"
-            width="115px"
-            height="115px"
-            class="crypto-logo"
-            @click="flipCard()"
-          >
-          <div
-            class="rate-information"
-            style="margin-left: 15px; padding: 12px 0;"
-          >
-
-            <div class="rate">
-              <p class="sub-title">Rate</p>
-              <p
-                v-if="showPriceLoader"
-                class="info-title"
-              >
-                Loading
-              </p>
-              <p
-                v-if="!showPriceLoader"
-                class="info-title"
-              > {{ coinPriceData.price }}
-              </p>
+          <div class="name-section">
+            <div class="name-container">
+              <span class="crypto-title">{{ coinname.toUpperCase() }} ({{ symbol }}) </span>
             </div>
-            <div class="marketcap">
-              <p class="sub-title">Market Cap</p>
-              <p
-                v-if="showPriceLoader"
-                class="info-title"
-              >
-                Loading 
-              </p>
-              <p
-                v-if="!showPriceLoader"
-                class="info-title"
-              >
-                {{ coinPriceData.marketcap }}
-              </p>
-            </div>
-            <!-- <div class="marketcap">
-              <p class="sub-title">Website</p>
-              <p class="info-title">
-                <a :href="coinDescription.websiteUrl">{{ coinname }}</a>
-              </p>
-            </div> -->
-
           </div>
-        </div>
 
-        <!-- <div class="about-coin-container">
-          <p v-if="!coinDescription.description"> Loading </p>
-          <p v-if="coinDescription.description"> {{ coinDescription.description }} </p>
-        </div> -->
-
-        <div class="headlines-container">
+          <div class="price-info-container">
+            <img
+              :src="logosrc"
+              width="115px"
+              height="115px"
+              class="crypto-logo"
+              @click="flipCard()"
+            >
+            <div
+              class="rate-information"
+              style="margin-left: 15px; padding: 12px 0;"
+            >
+              <PriceSection :symbol="symbol" />
+            </div>
+          </div>
           <p
             class="sub-title"
-            style="font-size: 18px;"
+            style="font-size: 18px;margin: 15px 0 5px 0;"
           >
             Latest headlines...
           </p>
+        </div>
 
+        <div class="headlines-container">
           <div class="headlines">
             <NewsFeed
               :cryptocur="coinname"
@@ -119,14 +78,25 @@
 .crypto-logo:hover {
   cursor: pointer;
 }
+.top-section {
+  background: #fff;
+  padding: 20px 20px 0 20px;
+}
 
+.card-main-section {
+  border: 1px solid #413e7e;
+  box-shadow: 1px 1px 1px #0000003b;
+  background-color: #fff;
+  border-radius: 5px;
+  width: 100%;
+}
 @media  (max-width:650px) {
   .crypto-card-container {
     min-width: 100%;
   }
 }
 .crypto-card-container {
-  min-height: 450px;
+  min-height: 435px;
   min-width: 274px;;
   overflow-y: visible;
   padding: 30px;
@@ -147,6 +117,11 @@
   align-items: center;
   flex-direction: column;
   display: flex;
+  width: 100%;
+  background-color: #fff;
+  border: 1px solid #413e7e;
+  box-shadow: 1px 1px 1px #0000003b;
+  border-radius: 5px;
 }
 .backside-icon-container:hover {
   cursor: pointer;
@@ -158,16 +133,12 @@
 }
 
 .crypto-title {
-  font-weight: 500;
+  font-weight: 300;
   font-size: 24px;
+  color: #413e7e;
 }
 
-.crypto-chart {
-  width: 220px;
-  height: 120px;
-  background-color: grey;
-}
-.top-section {
+.name-section {
   display: flex;
   flex-wrap: nowrap;
   justify-content: space-between;
@@ -178,33 +149,25 @@
   flex-wrap: nowrap;
 }
 
-.sub-title {
-  margin: 0;
+.headlines-container {
+  background-color: #f2f2f2;
+  z-index: 1000;
 }
-
-.info-title {
-  margin: 0;
-  font-size: 18px;
-  font-weight: 500;
-}
-
 .headlines {
-  margin-bottom: 10px;
+  border-top: 1px solid #bdbdbd;
 }
 </style>
 
 <script>
-
-import cryptocompare from 'cryptocompare'
-import axios from 'axios'
-import api from '../api/api'
 import NewsFeed from './NewsFeed'
+import PriceSection from './PriceSection'
 
 
 export default {
   name: 'CryptoCard',
   components: {
-    NewsFeed
+    NewsFeed,
+    PriceSection
   },
   props: {
     coinname: { type: String, required: true },
@@ -217,15 +180,12 @@ export default {
   },
   data() {
     return {
-      // coinDescription: {
-      //   description: '',
-      //   websiteUrl: '',
-      // },
       coinPriceData: {
         marketcap: '',
         price: '',
       },
       showPriceLoader: false,
+      showBackside: this.showbackside,
     }
   },
   computed: {
@@ -233,61 +193,10 @@ export default {
       if (this.showBackside) return `crypto-card-container justify-center ${this.cardcolor}`
       return `crypto-card-container justify-start ${this.cardcolor}`
     },
-    showBackside() {
-      return this.showbackside;
-    }
   },
-  watch: { 
-    updatecard: function(newVal, oldVal) { // watch it
-      if (newVal === true) {
-        this.showPriceLoader = true
-        this.fetchCoinInformation()
-      } else {
-        this.showPriceLoader = false
-      }
-    }
-  },
-  created() {
-    this.fetchCoinInformation()
-    debugger
-  },
-
-  // async beforeUpdate() {
-  //   if (this.updatecard === true) {
-  //     // this.showPriceLoader = true
-  //     this.fetchCoinInformation()
-  //     // this.showPriceLoader = false
-  //   }
-
-  // },
   methods: {
     flipCard() {
       this.showBackside = !this.showBackside
-      if (this.showBackside === false) this.fetchCoinInformation()
-    },
-    async fetchCoinInformation() {
-      try {
-        // const urlDescription = `https://www.cryptocompare.com/api/data/coinsnapshotfullbyid/?id=${this.coinid}`
-        const options = { method: 'GET' };
-        // const snapshot = await axios.get(urlDescription)
-        const url = `https://min-api.cryptocompare.com/data/pricemultifull?fsyms=${this.symbol}&tsyms=USD`
-        const priceData = await api.startFetchJsonData(url, options, 3)
-
-        // this.coinDescription = {
-        //   ...this.coinDescription,
-        //   description: snapshot.Data.General.Description,
-        //   websiteUrl: snapshot.Data.General.WebsiteUrl,
-        // }
-
-        this.coinPriceData = {
-          ...this.coinPriceData,
-          marketcap: priceData.DISPLAY[this.symbol].USD.MKTCAP,
-          price: priceData.DISPLAY[this.symbol].USD.PRICE,
-        }
-
-      } catch(e) {
-        console.log(e)
-      }
     },
   },
 }
