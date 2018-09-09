@@ -11,5 +11,5 @@ yarn install or npm install
 ## Running
 3. 
 ```
-yarn serve or npm serve
+npm run serve or yarn serve
 ```
