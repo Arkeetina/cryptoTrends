@@ -16,7 +16,6 @@
     >
       <CryptoCard
         v-for="cryptoCoin in cryptocomparedatalist"
-        :updatecard="updatecard"
         :key="cryptoCoin.coinid"
         :logosrc="cryptoCoin.imgurl"
         :showbackside="cryptoCoin.showbackside"
@@ -38,11 +37,13 @@
         class="load-more"
         @click="loadMoreCoins()"
       >
-        Load next 10 coins
+        <p
+          class="load-more-button"
+        >
+          Load next 10 coins
+        </p>
       </div>
     </div>
-    <Footer v-if="!isCryptoInfoLoading" />
-
   </div>
 </template>
 
@@ -53,10 +54,16 @@ body {
 
 .load-more {
   border: 0;
-  font-weight: 300;
-  font-size: 18px;
+  cursor: pointer;
+  box-shadow: 1px #000;
 }
 
+.load-more-button {
+  font-weight: 300;
+  font-size: 18px;
+  background-color: none;
+  border: none;
+}
 .load-more:hover {
   cursor: pointer;
 }
@@ -79,7 +86,7 @@ body {
 }
 
 .coins-list-section {
-  margin-top: 50px;
+  margin-top: 80px;
   display: grid;
   grid-template-columns: 1fr 1fr;
 }
@@ -98,9 +105,6 @@ body {
   }
 }
 
-.blue-card {
-  border: 1px dashed lightblue;
-}
 </style>
 
 <script>
@@ -124,7 +128,6 @@ export default {
       showButtonLoader: false,
       cryptocomparedatalist: [],
       pageNumb: 0,
-      updatecard: false,
     }
   },
   created() {
@@ -139,9 +142,8 @@ export default {
           }
           return coinObj
       });
-      this.updatecard = true;
+
       await this.$nextTick()
-      this.updatecard = false;
       this.cryptocomparedatalist = this.cryptocomparedatalist.map(coin => {
           const coinObj = {
             ...coin,
@@ -177,6 +179,7 @@ export default {
             symbol: coin.CoinInfo.Name,
             name: coin.CoinInfo.FullName,
             imgurl: `${cryptoComparaBaseUrl}${coin.CoinInfo.ImageUrl}`,
+            
             showbackside: false,
             cardcolor: this.setCardBackgroundColor(index),
           }

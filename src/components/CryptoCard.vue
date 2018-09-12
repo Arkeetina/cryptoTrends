@@ -176,7 +176,6 @@ export default {
     symbol: { type: String, required: true },
     cardcolor: { type: String, required: true },
     showbackside: { type: Boolean, required: true },
-    updatecard: { type: Boolean, required: true },
   },
   data() {
     return {
@@ -185,7 +184,7 @@ export default {
         price: '',
       },
       showPriceLoader: false,
-      showBackside: this.showbackside,
+      showBackside: false,
     }
   },
   computed: {
@@ -193,6 +192,12 @@ export default {
       if (this.showBackside) return `crypto-card-container justify-center ${this.cardcolor}`
       return `crypto-card-container justify-start ${this.cardcolor}`
     },
+  },
+  watch: {
+    showbackside() {
+      if(!this.showbackside) this.showBackside = false
+      if(this.showbackside) this.showBackside = true
+    }
   },
   methods: {
     flipCard() {
