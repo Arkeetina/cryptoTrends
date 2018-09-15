@@ -6,7 +6,9 @@
         v-if="showPriceLoader"
         class="info-title"
       >
-        Loading
+        <img
+          src="../assets/loader-small.svg"
+        >
       </p>
       <p
         v-if="!showPriceLoader"
@@ -20,7 +22,9 @@
         v-if="showPriceLoader"
         class="info-title"
       >
-        Loading
+        <img
+          src="../assets/loader-small.svg"
+        >
       </p>
       <p
         v-if="!showPriceLoader"
@@ -34,7 +38,9 @@
         v-if="showPriceLoader"
         class="info-title"
       >
-        Loading 
+        <img
+          src="../assets/loader-small.svg"
+        >
       </p>
       <p
         v-if="!showPriceLoader"

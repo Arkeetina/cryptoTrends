@@ -1,5 +1,11 @@
 <template>
-  <div :class="cardClass">
+  <div :class="cardClass + ' ' + heightclass">
+    <div
+      v-if="singleitem"
+      @click="onCloseClick()"
+    >
+      <p>X</p>
+    </div>
     <transition
       name="custom-classes-transition"
       enter-active-class="animated flipInY"
@@ -29,7 +35,7 @@
     >
       <div
         v-if="!showBackside"
-        class="card-main-section"
+        :class="'card-main-section ' + innerCardHeight"
       >
         <div class="top-section">
           <div class="name-section">
@@ -48,14 +54,14 @@
             >
             <div
               class="rate-information"
-              style="margin-left: 15px; padding: 12px 0;"
+              style="margin-left: 40px; padding: 12px 0;"
             >
               <PriceSection :symbol="symbol" />
             </div>
           </div>
           <p
             class="sub-title"
-            style="font-size: 18px;margin: 15px 0 5px 0;"
+            style="font-size: 18px;margin: 15px 0 10px 0;"
           >
             Latest headlines...
           </p>
@@ -80,7 +86,11 @@
 }
 .top-section {
   background: #fff;
-  padding: 20px 20px 0 20px;
+  height: 261px;
+  padding: 30px 30px 0 30px;
+  display: flex;
+  justify-content: space-between;
+  flex-direction: column;
 }
 
 .card-main-section {
@@ -88,16 +98,11 @@
   box-shadow: 1px 1px 1px #0000003b;
   background-color: #fff;
   border-radius: 5px;
-  width: 100%;
+  width: 380px;
 }
-@media  (max-width:650px) {
-  .crypto-card-container {
-    min-width: 100%;
-  }
-}
+
 .crypto-card-container {
-  min-height: 435px;
-  min-width: 274px;;
+  // min-width: 274px;
   overflow-y: visible;
   padding: 30px;
   display: flex;
@@ -117,7 +122,7 @@
   align-items: center;
   flex-direction: column;
   display: flex;
-  width: 100%;
+  width: 400px;
   background-color: #fff;
   border: 1px solid #413e7e;
   box-shadow: 1px 1px 1px #0000003b;
@@ -146,6 +151,7 @@
 
 .price-info-container {
   display: flex;
+  align-items: center;
   flex-wrap: nowrap;
 }
 
@@ -155,6 +161,21 @@
 }
 .headlines {
   border-top: 1px solid #bdbdbd;
+}
+
+.inner-card-height {
+  height: 360px;
+  margin-top: 40px
+}
+
+@media  (max-width:480px) {
+  .inner-card-height {
+    margin-top: 20px
+  }
+
+  .card-main-section  {
+    width: 355px;
+  }
 }
 </style>
 
@@ -176,6 +197,8 @@ export default {
     symbol: { type: String, required: true },
     cardcolor: { type: String, required: true },
     showbackside: { type: Boolean, required: true },
+    heightclass: { type: String, required: true },
+    singleitem: { type: Boolean, required: true },
   },
   data() {
     return {
@@ -190,8 +213,12 @@ export default {
   computed: {
     cardClass() {
       if (this.showBackside) return `crypto-card-container justify-center ${this.cardcolor}`
-      return `crypto-card-container justify-start ${this.cardcolor}`
+      return `crypto-card-container justify-center ${this.cardcolor}`
     },
+    innerCardHeight() {
+      if (this.heightclass) return 'inner-card-height'
+      return ''
+    }
   },
   watch: {
     showbackside() {
@@ -203,6 +230,9 @@ export default {
     flipCard() {
       this.showBackside = !this.showBackside
     },
+    onCloseClick() {
+      this.$emit('closecoin');
+    }
   },
 }
 </script>

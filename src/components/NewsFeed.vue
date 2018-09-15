@@ -118,7 +118,7 @@ export default {
   padding: 5px;
 }
 .newsfeed-container {
-  margin: 10px 10px 0 10px;
+  margin: 20px 30px 0 30px;
   overflow-y: scroll;
   height: 250px;
 }

@@ -1,40 +1,62 @@
 <template>
   <div
     class="header-container"
-    style="text-align: center"
   >
-    <p class="header-title">CryptoTrends</p>
-    <!-- <p style="margin:0">Search for crypto</p>
-    <input
-      v-model="searchInput"
-    > -->
-    <button
-      class="button"
-      @click="onFlipAllCoins"
-    >
-      Update coin information
-    </button>
+    <div class="header-items">
+      <div
+        class="title-container"
+        @click="onFlipAllCoins"
+      >
+        <p
+          class="header-title"
+        >
+          CryptoTrends
+        </p>
+        <span class="header-title-inner">Click me to update coins</span>
+      </div>
 
+      <vue-autosuggest
+        :suggestions="filteredOptions"
+        :on-selected="onSelected"
+        :limit="10"
+        :input-props="inputProps"
+        @click="onCoinClick"
+      />
+    </div>
   </div>
 </template>
 
 <style scroped lang="scss">
+  #autosuggest {
+    align-self: center;
+    width: 240px;
+  }
+
   .header-title {
     font-size: 24px;
     font-weight: 500;
+    margin: 0;
+    margin-bottom: -7px;
   }
-  .button {
-    background-color: #f8f8f8;
-    border: none;
-    
+
+  .header-title-inner {
+    font-size: 10px;
+    font-weight: 300;
+    margin-left: 2px;
   }
-  .button:hover {
+
+  .title-container {
+    margin: 10px 0;
+  }
+
+  .title-container:hover {
     cursor: pointer;
   }
+
   .header-container {
     width: 100%;
-    display: flex;
-    justify-content: space-between;
+    
+    padding: 0 20px;
     top: 0;
     background-color: #f8f8f8;
     color: #000;
@@ -42,27 +64,144 @@
     height: 80px;
     box-shadow: 1px 1px #000;
   }
+
+  .header-items {
+    display: flex;
+    margin: 6px 0;
+    justify-content: space-between;
+    padding: 0 10px;
+  }
+
+
+  #autosuggest__input {
+      outline: none;
+      position: relative;
+      display: block;
+      font-family: 'Avenir', Helvetica, Arial, sans-serif;
+      font-size: 16px;
+      border: 1px solid #616161;
+      padding: 7px;
+      width: 200px;
+      box-sizing: border-box;
+      -webkit-box-sizing: border-box;
+      -moz-box-sizing: border-box;
+    }
+    
+    #autosuggest__input.autosuggest__input-open {
+      border-bottom-left-radius: 0;
+      border-bottom-right-radius: 0;
+    }
+    
+    .autosuggest__results-container {
+      position: relative;
+      width: 200px;
+    }
+    
+    .autosuggest__results {
+      font-weight: 300;
+      margin: 0;
+      position: absolute;
+      z-index: 10000001;
+      width: 100%;
+      border: 1px solid #e0e0e0;
+      border-bottom-left-radius: 4px;
+      border-bottom-right-radius: 4px;
+      background: white;
+      padding: 0px;
+      overflow: scroll;
+      max-height: 200px;
+    }
+    
+    .autosuggest__results ul {
+      list-style: none;
+      padding-left: 0;
+      margin: 0;
+    }
+    
+    .autosuggest__results .autosuggest__results_item {
+      cursor: pointer;
+      padding: 15px;
+    }
+    
+    #autosuggest ul:nth-child(1) > .autosuggest__results_title {
+      border-top: none;
+    }
+    
+    .autosuggest__results .autosuggest__results_title {
+      color: gray;
+      font-size: 11px;
+      margin-left: 0;
+      padding: 15px 13px 5px;
+      border-top: 1px solid lightgray;
+    }
+    
+    .autosuggest__results .autosuggest__results_item:active,
+    .autosuggest__results .autosuggest__results_item:hover,
+    .autosuggest__results .autosuggest__results_item:focus,
+    .autosuggest__results .autosuggest__results_item.autosuggest__results_item-highlighted {
+      background-color: #ddd;
+    }
 </style>
 
 <script>
+import { VueAutosuggest } from 'vue-autosuggest';
 
 export default {
   name: 'Header',
+  components: {
+    VueAutosuggest,
+  },
   props: {
-    // flipallcoins: { type: Function, required: true },
+    namelist: { type: Array, required: true },
   },
   data() {
     return {
-      searchInput: '',
+      selectedCoin: '',
+      filteredOptions: [],
+      inputProps: {
+        id: "autosuggest__input",
+        onInputChange: this.onInputChange,
+        placeholder: "Type in coin name"
+      },
     }
   },
   computed: {
+    coinsList() {
+      return [{ data: this.namelist.map(coin => coin.name) }];
+    },
   },
   created() {
   },
   methods: {
+    onCoinClick() {
+      const symbol = this.namelist.filter(coin => coin.name === this.selectedCoin.item)
+      if(symbol.length) this.$emit('filterselectedcoin', symbol[0].symbol);
+    },
+
     onFlipAllCoins() {
       this.$emit('flipallcoins');
+    },
+
+    getSuggestionValue(suggestion) {
+      return suggestion.item;
+    },
+
+    onInputChange(text, oldText) {
+      if (text === null) {
+        return;
+      }
+ 
+      const filteredData = this.coinsList[0].data.filter(option => {
+        return option.toLowerCase().indexOf(text.toLowerCase()) > -1;
+      });
+ 
+      // Store data in one property, and filtered in another
+      this.filteredOptions = [{ data: filteredData }];
+    },
+
+    onSelected(item) {
+      this.selectedCoin = item;
+      this.onCoinClick()
     },
   },
 }
