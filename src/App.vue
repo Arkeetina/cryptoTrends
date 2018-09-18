@@ -1,19 +1,24 @@
 <template>
   <div id="app">
+
     <div
-      v-if="isCryptoInfoLoading"
+      v-if="showInitLoader && !showLoader"
       class="loader-container"
     >
       <img src="./assets/loader.svg">
     </div>
+
+
     <Header
-      v-if="!isCryptoInfoLoading"
+      v-if="!showInitLoader"
       :namelist="coinsNameList"
       @filterselectedcoin="filterSelectedCoin"
       @flipallcoins="flipAllCoins"
     />
+
+
     <div
-      v-if="!isCryptoInfoLoading"
+      v-if="!showInitLoader && !showLoader"
       :class="containerClass"
     >
       <CryptoCard
@@ -30,8 +35,18 @@
         @closecoin="loadCryptoData"
       />
     </div>
+
+
     <div
-      v-if="!isCryptoInfoLoading && !singleItem"
+      v-if="showLoader"
+      class="loader-container"
+    >
+      <img src="./assets/loader.svg">
+    </div>
+
+
+    <div
+      v-if="!showInitLoader && !showLoader && !singleItem"
       class="load-more-button-container"
     >
       <div
@@ -87,7 +102,6 @@ body {
   background-color: #f8f8f8;
   padding: 15px 0;
   width: 100%;
-  // text-align: center;
 }
 
 .loader-container {
@@ -154,7 +168,8 @@ export default {
   },
   data() {
     return {
-      isCryptoInfoLoading: true,
+      showInitLoader: true,
+      showLoader: false,
       coinsNameList: [],
       showButtonLoader: false,
       cryptocomparedatalist: [],
@@ -201,6 +216,7 @@ export default {
     filterSelectedCoin(coin) {
       const coinItemSelected = this.cryptocomparedatalist.filter(coinItem => coinItem.symbol === coin)
       if (!coinItemSelected.length) {
+        this.showLoader = true;
         this.loadCoinData(coin)
       } else {
         this.cryptocomparedatalist = coinItemSelected
@@ -241,7 +257,6 @@ export default {
         const cryptoCompareUrl = `https://min-api.cryptocompare.com/data/top/exchanges/full?fsym=${coinSymbol}&tsym=USD`
         const options = { method: 'GET' }
         const coinInformation = await api.startFetchJsonData(cryptoCompareUrl, options, 3)
-        debugger;
         const coinData = [{
           coinid: coinInformation.Data.CoinInfo.Id,
           symbol: coinInformation.Data.CoinInfo.Name,
@@ -253,16 +268,16 @@ export default {
 
         this.cryptocomparedatalist = coinData;
         
-        this.isCryptoInfoLoading = false
+        this.showLoader = false
       } catch(e) {
-        this.isCryptoInfoLoading = false
+        this.showLoader = false
         console.log(e)
       }
     },
 
-    async loadCryptoData() {
+    async loadCryptoData(refetchOnClose=false) {
       try {
-        this.isCryptoInfoLoading = true
+        if (refetchOnClose) this.showLoader = true
         const cryptoCompareUrl = `https://min-api.cryptocompare.com/data/top/totalvol?limit=10&tsym=USD&page=${this.pageNumb}`
         const options = { method: 'GET' }
         const coinInformationList = await api.startFetchJsonData(cryptoCompareUrl, options, 3)
@@ -279,16 +294,18 @@ export default {
           return coinObj
         })
 
-        if (this.cryptocomparedatalist.length) {
+        if (this.cryptocomparedatalist.length && !refetchOnClose) {
           this.cryptocomparedatalist = [...this.cryptocomparedatalist, ...newData]
         } else {
           this.cryptocomparedatalist = newData
         }
 
         
-        this.isCryptoInfoLoading = false
+        if (refetchOnClose) this.showLoader = false
+        if (!refetchOnClose) this.showInitLoader = false
       } catch(e) {
-        this.isCryptoInfoLoading = false
+        if (refetchOnClose) this.showLoader = false
+        if(!refetchOnClose) this.showInitLoader = false
         console.log(e)
       }
     }

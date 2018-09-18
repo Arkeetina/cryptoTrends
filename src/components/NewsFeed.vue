@@ -69,7 +69,7 @@ export default {
   },
   methods: {
     setArrLength(arr) {
-      if (arr.length < 9) return arr.length
+      if (arr.length < 9) return arr.length - 1;
       return 9
     },
     async fetchArticles() {
@@ -77,7 +77,6 @@ export default {
         const setCoinQueryName = this.cryptocurName.toLowerCase().split(' ').join('-')
         const articlesData = await api.coinNewsApi.getTopNewsByCoin(setCoinQueryName, 'en')
         this.loadingArticles = false
-        // add a check for array length
         this.articlesData = articlesData.slice(0, this.setArrLength(articlesData))
       } catch(e) {
         this.loadingArticles = false

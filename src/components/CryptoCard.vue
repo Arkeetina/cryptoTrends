@@ -231,7 +231,7 @@ export default {
       this.showBackside = !this.showBackside
     },
     onCloseClick() {
-      this.$emit('closecoin');
+      this.$emit('closecoin', true);
     }
   },
 }
