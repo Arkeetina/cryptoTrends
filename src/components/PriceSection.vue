@@ -59,7 +59,7 @@
 
   .info-title {
     margin: 0;
-    font-size: 18px;
+    font-size: 17px;
     font-weight: 500;
   }
 
@@ -70,6 +70,15 @@
   .red {
     color: red;
   }
+
+
+  @media (max-width:480px) {
+    .price-info-container {
+      font-size: 15px;
+    }
+  }
+
+
 </style>
 
 <script>

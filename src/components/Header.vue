@@ -5,14 +5,13 @@
     <div class="header-items">
       <div
         class="title-container"
-        @click="onFlipAllCoins"
+        @click="reloadCoins"
       >
         <p
           class="header-title"
         >
           CryptoTrends
         </p>
-        <span class="header-title-inner">Click me to update coins</span>
       </div>
 
       <vue-autosuggest
@@ -20,7 +19,6 @@
         :on-selected="onSelected"
         :limit="10"
         :input-props="inputProps"
-        @click="onCoinClick"
       />
     </div>
   </div>
@@ -29,7 +27,6 @@
 <style scroped lang="scss">
   #autosuggest {
     align-self: center;
-    width: 240px;
   }
 
   .header-title {
@@ -45,31 +42,26 @@
     margin-left: 2px;
   }
 
-  .title-container {
-    margin: 10px 0;
-  }
-
   .title-container:hover {
     cursor: pointer;
   }
 
   .header-container {
     width: 100%;
-    
-    padding: 0 20px;
     top: 0;
     background-color: #f8f8f8;
     color: #000;
     position: fixed;
     height: 80px;
+    z-index: 100;
     box-shadow: 1px 1px #000;
   }
 
   .header-items {
     display: flex;
-    margin: 6px 0;
+    margin: 22px 0;
     justify-content: space-between;
-    padding: 0 10px;
+    padding: 0 15px;
   }
 
 
@@ -141,6 +133,23 @@
     .autosuggest__results .autosuggest__results_item.autosuggest__results_item-highlighted {
       background-color: #ddd;
     }
+
+  @media (max-width:480px) {
+      .header-items {
+        flex-direction: column;
+        align-items: center;
+        margin: 15px 0;
+      }
+
+      .header-title {
+        margin-bottom: 5px;
+        font-size: 30px;
+      }
+
+      .header-container {
+        height: 120px;
+      }
+  }
 </style>
 
 <script>
@@ -153,6 +162,7 @@ export default {
   },
   props: {
     namelist: { type: Array, required: true },
+    itemslength: { type: Number, required: true },
   },
   data() {
     return {
@@ -178,8 +188,8 @@ export default {
       if(symbol.length) this.$emit('filterselectedcoin', symbol[0].symbol);
     },
 
-    onFlipAllCoins() {
-      this.$emit('flipallcoins');
+    reloadCoins() {
+      this.$emit('reloadcoins', true);
     },
 
     getSuggestionValue(suggestion) {
@@ -189,6 +199,10 @@ export default {
     onInputChange(text, oldText) {
       if (text === null) {
         return;
+      }
+
+      if (text === '' && this.itemslength === 1) {
+        this.$emit('reloadcoins', true);
       }
  
       const filteredData = this.coinsList[0].data.filter(option => {

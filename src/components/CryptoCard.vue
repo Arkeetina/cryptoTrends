@@ -1,18 +1,13 @@
 <template>
-  <div :class="cardClass + ' ' + heightclass">
-    <div
-      v-if="singleitem"
-      @click="onCloseClick()"
-    >
-      <p>X</p>
-    </div>
+  <div :class="cardClass">
     <transition
+      :duration="{ enter: 1000 }"
       name="custom-classes-transition"
       enter-active-class="animated flipInY"
     >
       <div
         v-if="showBackside"
-        class="backside-icon-container"
+        :class="'backside-icon-container ' + innerCardHeight"
         @click="flipCard()"
       >
         <img
@@ -30,6 +25,7 @@
     </transition>
 
     <transition
+      :duration="{ enter: 1000 }"
       name="custom-classes-transition"
       enter-active-class="animated flipInY"
     >
@@ -47,14 +43,11 @@
           <div class="price-info-container">
             <img
               :src="logosrc"
-              width="115px"
-              height="115px"
               class="crypto-logo"
               @click="flipCard()"
             >
             <div
               class="rate-information"
-              style="margin-left: 40px; padding: 12px 0;"
             >
               <PriceSection :symbol="symbol" />
             </div>
@@ -84,6 +77,10 @@
 .crypto-logo:hover {
   cursor: pointer;
 }
+.crypto-logo {
+  height: 115px;
+  width: 115px;
+}
 .top-section {
   background: #fff;
   height: 261px;
@@ -91,6 +88,16 @@
   display: flex;
   justify-content: space-between;
   flex-direction: column;
+}
+
+.cross-button {
+  font-size: 18px;
+  color: white;
+  font-weight: 500;
+}
+
+.cross-button:hover {
+  cursor: pointer;
 }
 
 .card-main-section {
@@ -101,8 +108,12 @@
   width: 380px;
 }
 
+.rate-information {
+  margin-left: 40px;
+  padding: 12px 0;
+}
+
 .crypto-card-container {
-  // min-width: 274px;
   overflow-y: visible;
   padding: 30px;
   display: flex;
@@ -122,11 +133,12 @@
   align-items: center;
   flex-direction: column;
   display: flex;
-  width: 400px;
+  width: 380px;
+  min-height: 562px;
   background-color: #fff;
   border: 1px solid #413e7e;
   box-shadow: 1px 1px 1px #0000003b;
-  border-radius: 5px;
+  border-radius: 2px;
 }
 .backside-icon-container:hover {
   cursor: pointer;
@@ -164,17 +176,32 @@
 }
 
 .inner-card-height {
-  height: 360px;
-  margin-top: 40px
+  min-height: 562px;
+  margin-top: 40px;
 }
 
 @media  (max-width:480px) {
   .inner-card-height {
-    margin-top: 20px
+    margin-top: 20px;
+  }
+
+  .backside-icon-container {
+    width: 355px;
+  }
+
+  .crypto-logo { 
+    height: 90px;
+    width: 90px;
+  }
+
+  .rate-information {
+    margin-left: 20px;
+    font-size: 13px;
   }
 
   .card-main-section  {
     width: 355px;
+    height: 550px;
   }
 }
 </style>
@@ -197,7 +224,6 @@ export default {
     symbol: { type: String, required: true },
     cardcolor: { type: String, required: true },
     showbackside: { type: Boolean, required: true },
-    heightclass: { type: String, required: true },
     singleitem: { type: Boolean, required: true },
   },
   data() {
@@ -216,8 +242,7 @@ export default {
       return `crypto-card-container justify-center ${this.cardcolor}`
     },
     innerCardHeight() {
-      if (this.heightclass) return 'inner-card-height'
-      return ''
+      return 'inner-card-height'
     }
   },
   watch: {
@@ -230,9 +255,9 @@ export default {
     flipCard() {
       this.showBackside = !this.showBackside
     },
-    onCloseClick() {
-      this.$emit('closecoin');
-    }
+    // onCloseClick() {
+    //   this.$emit('closecoin', true);
+    // }
   },
 }
 </script>

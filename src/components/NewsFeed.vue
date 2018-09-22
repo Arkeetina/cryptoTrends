@@ -10,8 +10,8 @@
             <div class="news-img-container">
               <img
                 :src="article.originalImageUrl"
-                width="60px"
-                height="60px"
+                width="90px"
+                height="80px"
               >
             </div>
             <div class="news-source-container">
@@ -69,7 +69,7 @@ export default {
   },
   methods: {
     setArrLength(arr) {
-      if (arr.length < 9) return arr.length
+      if (arr.length < 9) return arr.length - 1;
       return 9
     },
     async fetchArticles() {
@@ -77,7 +77,6 @@ export default {
         const setCoinQueryName = this.cryptocurName.toLowerCase().split(' ').join('-')
         const articlesData = await api.coinNewsApi.getTopNewsByCoin(setCoinQueryName, 'en')
         this.loadingArticles = false
-        // add a check for array length
         this.articlesData = articlesData.slice(0, this.setArrLength(articlesData))
       } catch(e) {
         this.loadingArticles = false
@@ -111,7 +110,7 @@ export default {
   margin-top: 5px;
 }
 .news-row-section {
-  font-size: 14px;
+  font-size: 13px;
   margin-top: 10px;
 }
 .news-source-container {

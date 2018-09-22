@@ -1,24 +1,29 @@
 <template>
   <div id="app">
+
     <div
-      v-if="isCryptoInfoLoading"
+      v-if="showInitLoader && !showLoader"
       class="loader-container"
     >
       <img src="./assets/loader.svg">
     </div>
+
+
     <Header
-      v-if="!isCryptoInfoLoading"
+      v-if="!showInitLoader"
       :namelist="coinsNameList"
+      :itemslength="cryptocomparedatalist.length"
       @filterselectedcoin="filterSelectedCoin"
-      @flipallcoins="flipAllCoins"
+      @reloadcoins="loadCryptoData"
     />
+
+
     <div
-      v-if="!isCryptoInfoLoading"
+      v-if="!showInitLoader && !showLoader"
       :class="containerClass"
     >
       <CryptoCard
         v-for="cryptoCoin in cryptocomparedatalist"
-        :heightclass="heightClass"
         :key="cryptoCoin.coinid"
         :logosrc="cryptoCoin.imgurl"
         :showbackside="cryptoCoin.showbackside"
@@ -27,11 +32,20 @@
         :coinname="cryptoCoin.name"
         :cardcolor="cryptoCoin.cardcolor"
         :singleitem="singleItem"
-        @closecoin="loadCryptoData"
       />
+
     </div>
+
     <div
-      v-if="!isCryptoInfoLoading && !singleItem"
+      v-if="showLoader"
+      class="loader-container"
+    >
+      <img src="./assets/loader.svg">
+    </div>
+
+
+    <div
+      v-if="!showInitLoader && !showLoader && !singleItem"
       class="load-more-button-container"
     >
       <div
@@ -44,6 +58,15 @@
           src="./assets/loader-small.svg"
         >
       </div>
+
+      <div
+        v-if="singleItem"
+        class="load-more"
+        @click="loadCryptoData"
+      >
+        <p class="cross-button">Load full list</p>
+      </div>
+
       <div
         v-if="!showButtonLoader && !singleItem"
         class="load-more"
@@ -55,6 +78,7 @@
           Load next 10 coins
         </p>
       </div>
+
     </div>
   </div>
 </template>
@@ -86,8 +110,8 @@ body {
 .load-more-button-container {
   background-color: #f8f8f8;
   padding: 15px 0;
-  width: 100%;
-  // text-align: center;
+  bottom: 0;
+  border-top: 1px solid #413e7e;
 }
 
 .loader-container {
@@ -102,10 +126,12 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   color: #2c3e50;
+  background-color: #726cda;
 }
 
 .coins-list-section {
   margin-top: 80px;
+  // margin-bottom: 50px;
   display: grid;
   grid-template-columns: 1fr 1fr;
 }
@@ -125,13 +151,21 @@ body {
   background-color: #726cda;
 }
 
-.card-height {
-  height: 90vh;
-}
-
 @media (max-width: 860px) {
   .coins-list-section {
-    grid-template-columns: 1fr;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .coins-list-section-single-item {
+    display: flex;
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 480px) {
+  .coins-list-section {
+    margin-top: 120px;
   }
 }
 </style>
@@ -153,7 +187,8 @@ export default {
   },
   data() {
     return {
-      isCryptoInfoLoading: true,
+      showInitLoader: true,
+      showLoader: false,
       coinsNameList: [],
       showButtonLoader: false,
       cryptocomparedatalist: [],
@@ -161,10 +196,6 @@ export default {
     };
   },
   computed: {
-    heightClass() {
-      if (this.cryptocomparedatalist.length === 1) return "card-height";
-      return "";
-    },
     containerClass() {
       if (this.cryptocomparedatalist.length === 1)
         return "coins-list-section-single-item";
@@ -179,30 +210,31 @@ export default {
     this.loadCoinNames();
   },
   methods: {
-    async flipAllCoins() {
-      this.cryptocomparedatalist = this.cryptocomparedatalist.map(coin => {
-        const coinObj = {
-          ...coin,
-          showbackside: true
-        };
-        return coinObj;
-      });
+    // async flipAllCoins() {
+    //   this.cryptocomparedatalist = this.cryptocomparedatalist.map(coin => {
+    //     const coinObj = {
+    //       ...coin,
+    //       showbackside: true
+    //     };
+    //     return coinObj;
+    //   });
 
-      await this.$nextTick();
-      this.cryptocomparedatalist = this.cryptocomparedatalist.map(coin => {
-        const coinObj = {
-          ...coin,
-          showbackside: false
-        };
-        return coinObj;
-      });
-    },
+    //   await this.$nextTick();
+    //   this.cryptocomparedatalist = this.cryptocomparedatalist.map(coin => {
+    //     const coinObj = {
+    //       ...coin,
+    //       showbackside: false
+    //     };
+    //     return coinObj;
+    //   });
+    // },
 
     filterSelectedCoin(coin) {
       const coinItemSelected = this.cryptocomparedatalist.filter(
         coinItem => coinItem.symbol === coin
       );
       if (!coinItemSelected.length) {
+        this.showLoader = true;
         this.loadCoinData(coin);
       } else {
         this.cryptocomparedatalist = coinItemSelected;
@@ -227,18 +259,21 @@ export default {
 
     async loadCoinNames() {
       try {
-        const coinMarketCapUrl = "https://api.coinmarketcap.com/v2/listings/";
+        const cryptoCompareUrl =
+          "https://min-api.cryptocompare.com/data/all/coinlist";
         const options = { method: "GET" };
         const coinNameList = await api.startFetchJsonData(
-          coinMarketCapUrl,
+          cryptoCompareUrl,
           options,
           3
         );
 
-        const list = coinNameList.data.map(coin => ({
-          name: coin.name,
-          symbol: coin.symbol
-        }));
+        const list = Object.keys(coinNameList.Data).map(coin => {
+          return {
+            name: coinNameList.Data[coin].CoinName,
+            symbol: coinNameList.Data[coin].Symbol
+          };
+        });
         this.coinsNameList = list;
       } catch (e) {
         console.log(e);
@@ -255,7 +290,6 @@ export default {
           options,
           3
         );
-
         const coinData = [
           {
             coinid: coinInformation.Data.CoinInfo.Id,
@@ -271,16 +305,16 @@ export default {
 
         this.cryptocomparedatalist = coinData;
 
-        this.isCryptoInfoLoading = false;
+        this.showLoader = false;
       } catch (e) {
-        this.isCryptoInfoLoading = false;
+        this.showLoader = false;
         console.log(e);
       }
     },
 
-    async loadCryptoData() {
+    async loadCryptoData(refetchOnClose = false) {
       try {
-        this.isCryptoInfoLoading = true;
+        if (refetchOnClose) this.showLoader = true;
         const cryptoCompareUrl = `https://min-api.cryptocompare.com/data/top/totalvol?limit=10&tsym=USD&page=${
           this.pageNumb
         }`;
@@ -303,7 +337,7 @@ export default {
           return coinObj;
         });
 
-        if (this.cryptocomparedatalist.length) {
+        if (this.cryptocomparedatalist.length && !refetchOnClose) {
           this.cryptocomparedatalist = [
             ...this.cryptocomparedatalist,
             ...newData
@@ -312,9 +346,11 @@ export default {
           this.cryptocomparedatalist = newData;
         }
 
-        this.isCryptoInfoLoading = false;
+        if (refetchOnClose) this.showLoader = false;
+        if (!refetchOnClose) this.showInitLoader = false;
       } catch (e) {
-        this.isCryptoInfoLoading = false;
+        if (refetchOnClose) this.showLoader = false;
+        if (!refetchOnClose) this.showInitLoader = false;
         console.log(e);
       }
     }
