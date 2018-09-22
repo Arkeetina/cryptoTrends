@@ -10,8 +10,8 @@
             <div class="news-img-container">
               <img
                 :src="article.originalImageUrl"
-                width="60px"
-                height="60px"
+                width="90px"
+                height="80px"
               >
             </div>
             <div class="news-source-container">
@@ -110,7 +110,7 @@ export default {
   margin-top: 5px;
 }
 .news-row-section {
-  font-size: 14px;
+  font-size: 13px;
   margin-top: 10px;
 }
 .news-source-container {

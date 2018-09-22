@@ -12,8 +12,9 @@
     <Header
       v-if="!showInitLoader"
       :namelist="coinsNameList"
+      :itemslength="cryptocomparedatalist.length"
       @filterselectedcoin="filterSelectedCoin"
-      @flipallcoins="flipAllCoins"
+      @reloadcoins="loadCryptoData"
     />
 
 
@@ -23,7 +24,6 @@
     >
       <CryptoCard
         v-for="cryptoCoin in cryptocomparedatalist"
-        :heightclass="heightClass"
         :key="cryptoCoin.coinid"
         :logosrc="cryptoCoin.imgurl"
         :showbackside="cryptoCoin.showbackside"
@@ -32,10 +32,9 @@
         :coinname="cryptoCoin.name"
         :cardcolor="cryptoCoin.cardcolor"
         :singleitem="singleItem"
-        @closecoin="loadCryptoData"
       />
-    </div>
 
+    </div>
 
     <div
       v-if="showLoader"
@@ -59,6 +58,15 @@
           src="./assets/loader-small.svg"
         >
       </div>
+
+      <div
+        v-if="singleItem"
+        class="load-more"
+        @click="loadCryptoData"
+      >
+        <p class="cross-button">Load full list</p>
+      </div>
+
       <div
         v-if="!showButtonLoader && !singleItem"
         class="load-more"
@@ -70,13 +78,14 @@
           Load next 10 coins
         </p>
       </div>
+
     </div>
   </div>
 </template>
 
 <style lang="scss">
 body {
-  margin: 0
+  margin: 0;
 }
 
 .load-more {
@@ -101,7 +110,8 @@ body {
 .load-more-button-container {
   background-color: #f8f8f8;
   padding: 15px 0;
-  width: 100%;
+  bottom: 0;
+  border-top: 1px solid #413e7e;
 }
 
 .loader-container {
@@ -112,14 +122,16 @@ body {
 }
 
 #app {
-  font-family: 'Avenir', Helvetica, Arial, sans-serif;
+  font-family: "Avenir", Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   color: #2c3e50;
+  background-color: #726cda;
 }
 
 .coins-list-section {
   margin-top: 80px;
+  // margin-bottom: 50px;
   display: grid;
   grid-template-columns: 1fr 1fr;
 }
@@ -139,32 +151,39 @@ body {
   background-color: #726cda;
 }
 
-.card-height {
-  height: 90vh;
-}
-
-@media  (max-width: 750px) {
+@media (max-width: 860px) {
   .coins-list-section {
-    grid-template-columns: 1fr;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .coins-list-section-single-item {
+    display: flex;
+    flex-direction: column;
   }
 }
 
+@media (max-width: 480px) {
+  .coins-list-section {
+    margin-top: 120px;
+  }
+}
 </style>
 
 <script>
-import CryptoCard from './components/CryptoCard.vue'
-import Header from './components/Header'
-import Footer from './components/Footer'
-import api from './api/api'
+import CryptoCard from "./components/CryptoCard.vue";
+import Header from "./components/Header";
+import Footer from "./components/Footer";
+import api from "./api/api";
 
-const cryptoComparaBaseUrl = 'https://cryptocompare.com'
+const cryptoComparaBaseUrl = "https://cryptocompare.com";
 
 export default {
-  name: 'App',
+  name: "App",
   components: {
     CryptoCard,
     Header,
-    Footer,
+    Footer
   },
   data() {
     return {
@@ -173,83 +192,89 @@ export default {
       coinsNameList: [],
       showButtonLoader: false,
       cryptocomparedatalist: [],
-      pageNumb: 0,
-    }
+      pageNumb: 0
+    };
   },
   computed: {
-    heightClass() {
-      if(this.cryptocomparedatalist.length === 1) return "card-height"
-      return ""
-    },
     containerClass() {
-      if(this.cryptocomparedatalist.length === 1) return "coins-list-section-single-item"
-      return "coins-list-section"
+      if (this.cryptocomparedatalist.length === 1)
+        return "coins-list-section-single-item";
+      return "coins-list-section";
     },
     singleItem() {
-      return this.cryptocomparedatalist.length === 1
+      return this.cryptocomparedatalist.length === 1;
     }
   },
   created() {
-    this.loadCryptoData()
-    this.loadCoinNames()
+    this.loadCryptoData();
+    this.loadCoinNames();
   },
   methods: {
-    async flipAllCoins() {
-      this.cryptocomparedatalist = this.cryptocomparedatalist.map(coin => {
-          const coinObj = {
-            ...coin,
-            showbackside: true,
-          }
-          return coinObj
-      });
+    // async flipAllCoins() {
+    //   this.cryptocomparedatalist = this.cryptocomparedatalist.map(coin => {
+    //     const coinObj = {
+    //       ...coin,
+    //       showbackside: true
+    //     };
+    //     return coinObj;
+    //   });
 
-      await this.$nextTick()
-      this.cryptocomparedatalist = this.cryptocomparedatalist.map(coin => {
-          const coinObj = {
-            ...coin,
-            showbackside: false,
-          }
-          return coinObj
-      });
-    },
+    //   await this.$nextTick();
+    //   this.cryptocomparedatalist = this.cryptocomparedatalist.map(coin => {
+    //     const coinObj = {
+    //       ...coin,
+    //       showbackside: false
+    //     };
+    //     return coinObj;
+    //   });
+    // },
 
     filterSelectedCoin(coin) {
-      const coinItemSelected = this.cryptocomparedatalist.filter(coinItem => coinItem.symbol === coin)
+      const coinItemSelected = this.cryptocomparedatalist.filter(
+        coinItem => coinItem.symbol === coin
+      );
       if (!coinItemSelected.length) {
         this.showLoader = true;
         this.loadCoinData(coin)
       } else {
-        this.cryptocomparedatalist = coinItemSelected
+        this.cryptocomparedatalist = coinItemSelected;
       }
     },
 
     setCardBackgroundColor(index) {
-      if (((index / 3) + index) % 2 === 0) {
-        return "dark-purple"
-      } 
-      return "light-purple"
+      if ((index / 3 + index) % 2 === 0) {
+        return "dark-purple";
+      }
+      return "light-purple";
     },
 
     async loadMoreCoins() {
-      this.pageNumb = this.pageNumb + 1
-      this.showButtonLoader = true
-      await this.loadCryptoData()
-      this.showButtonLoader = false
+      this.pageNumb = this.pageNumb + 1;
+      this.showButtonLoader = true;
+      await this.loadCryptoData();
+      this.showButtonLoader = false;
     },
 
     async loadCoinNames() {
       try {
-        const coinMarketCapUrl = 'https://api.coinmarketcap.com/v2/listings/'
-        const options = { method: 'GET' }
-        const coinNameList = await api.startFetchJsonData(coinMarketCapUrl, options, 3)
+        const cryptoCompareUrl = "https://min-api.cryptocompare.com/data/all/coinlist";
+        const options = { method: "GET" };
+        const coinNameList = await api.startFetchJsonData(
+          cryptoCompareUrl,
+          options,
+          3
+        );
 
-        const list = coinNameList.data.map(coin => ({ name: coin.name, symbol: coin.symbol }) );
+        const list = Object.keys(coinNameList.Data).map(coin => {
+          return {
+          name: coinNameList.Data[coin].CoinName,
+          symbol: coinNameList.Data[coin].Symbol
+        }});
         this.coinsNameList = list;
-      } catch(e) {
-        console.log(e)
+      } catch (e) {
+        console.log(e);
         this.coinsNameList = [];
       }
-      
     },
 
     async loadCoinData(coinSymbol) {
@@ -289,15 +314,15 @@ export default {
             name: coin.CoinInfo.FullName,
             imgurl: `${cryptoComparaBaseUrl}${coin.CoinInfo.ImageUrl}`,
             showbackside: false,
-            cardcolor: this.setCardBackgroundColor(index),
-          }
-          return coinObj
-        })
+            cardcolor: this.setCardBackgroundColor(index)
+          };
+          return coinObj;
+        });
 
         if (this.cryptocomparedatalist.length && !refetchOnClose) {
           this.cryptocomparedatalist = [...this.cryptocomparedatalist, ...newData]
         } else {
-          this.cryptocomparedatalist = newData
+          this.cryptocomparedatalist = newData;
         }
 
         
@@ -310,5 +335,5 @@ export default {
       }
     }
   }
-}
+};
 </script>
