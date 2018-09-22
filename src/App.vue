@@ -210,7 +210,9 @@ export default {
     },
 
     setCardBackgroundColor(index) {
-      if ((index / 3 + index) % 2 === 0) {
+      let currIndex = index + this.pageNumb * 10;
+
+      if ((currIndex + 1) % 4 === 0 || currIndex % 4 === 0) {
         return "dark-purple";
       }
       return "light-purple";
@@ -253,7 +255,7 @@ export default {
           options,
           3
         );
-        debugger;
+
         const coinData = [
           {
             coinid: coinInformation.Data.CoinInfo.Id,
