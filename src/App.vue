@@ -235,14 +235,16 @@ export default {
       );
       if (!coinItemSelected.length) {
         this.showLoader = true;
-        this.loadCoinData(coin)
+        this.loadCoinData(coin);
       } else {
         this.cryptocomparedatalist = coinItemSelected;
       }
     },
 
     setCardBackgroundColor(index) {
-      if ((index / 3 + index) % 2 === 0) {
+      let currIndex = index + this.pageNumb * 10;
+
+      if ((currIndex + 1) % 4 === 0 || currIndex % 4 === 0) {
         return "dark-purple";
       }
       return "light-purple";
@@ -257,7 +259,8 @@ export default {
 
     async loadCoinNames() {
       try {
-        const cryptoCompareUrl = "https://min-api.cryptocompare.com/data/all/coinlist";
+        const cryptoCompareUrl =
+          "https://min-api.cryptocompare.com/data/all/coinlist";
         const options = { method: "GET" };
         const coinNameList = await api.startFetchJsonData(
           cryptoCompareUrl,
@@ -267,9 +270,10 @@ export default {
 
         const list = Object.keys(coinNameList.Data).map(coin => {
           return {
-          name: coinNameList.Data[coin].CoinName,
-          symbol: coinNameList.Data[coin].Symbol
-        }});
+            name: coinNameList.Data[coin].CoinName,
+            symbol: coinNameList.Data[coin].Symbol
+          };
+        });
         this.coinsNameList = list;
       } catch (e) {
         console.log(e);
@@ -279,35 +283,49 @@ export default {
 
     async loadCoinData(coinSymbol) {
       try {
-        const cryptoCompareUrl = `https://min-api.cryptocompare.com/data/top/exchanges/full?fsym=${coinSymbol}&tsym=USD`
-        const options = { method: 'GET' }
-        const coinInformation = await api.startFetchJsonData(cryptoCompareUrl, options, 3)
-        const coinData = [{
-          coinid: coinInformation.Data.CoinInfo.Id,
-          symbol: coinInformation.Data.CoinInfo.Name,
-          name: coinInformation.Data.CoinInfo.FullName,
-          imgurl: `${cryptoComparaBaseUrl}${coinInformation.Data.CoinInfo.ImageUrl}`,
-          showbackside: false,
-          cardcolor: this.setCardBackgroundColor(1),
-        }]
+        const cryptoCompareUrl = `https://min-api.cryptocompare.com/data/top/exchanges/full?fsym=${coinSymbol}&tsym=USD`;
+        const options = { method: "GET" };
+        const coinInformation = await api.startFetchJsonData(
+          cryptoCompareUrl,
+          options,
+          3
+        );
+        const coinData = [
+          {
+            coinid: coinInformation.Data.CoinInfo.Id,
+            symbol: coinInformation.Data.CoinInfo.Name,
+            name: coinInformation.Data.CoinInfo.FullName,
+            imgurl: `${cryptoComparaBaseUrl}${
+              coinInformation.Data.CoinInfo.ImageUrl
+            }`,
+            showbackside: false,
+            cardcolor: this.setCardBackgroundColor(1)
+          }
+        ];
 
         this.cryptocomparedatalist = coinData;
-        
-        this.showLoader = false
-      } catch(e) {
-        this.showLoader = false
-        console.log(e)
+
+        this.showLoader = false;
+      } catch (e) {
+        this.showLoader = false;
+        console.log(e);
       }
     },
 
-    async loadCryptoData(refetchOnClose=false) {
+    async loadCryptoData(refetchOnClose = false) {
       try {
-        if (refetchOnClose) this.showLoader = true
-        const cryptoCompareUrl = `https://min-api.cryptocompare.com/data/top/totalvol?limit=10&tsym=USD&page=${this.pageNumb}`
-        const options = { method: 'GET' }
-        const coinInformationList = await api.startFetchJsonData(cryptoCompareUrl, options, 3)
-        
-        const newData= coinInformationList.Data.map((coin, index) => {
+        if (refetchOnClose) this.showLoader = true;
+        const cryptoCompareUrl = `https://min-api.cryptocompare.com/data/top/totalvol?limit=10&tsym=USD&page=${
+          this.pageNumb
+        }`;
+        const options = { method: "GET" };
+        const coinInformationList = await api.startFetchJsonData(
+          cryptoCompareUrl,
+          options,
+          3
+        );
+
+        const newData = coinInformationList.Data.map((coin, index) => {
           const coinObj = {
             coinid: coin.CoinInfo.Id,
             symbol: coin.CoinInfo.Name,
@@ -320,18 +338,20 @@ export default {
         });
 
         if (this.cryptocomparedatalist.length && !refetchOnClose) {
-          this.cryptocomparedatalist = [...this.cryptocomparedatalist, ...newData]
+          this.cryptocomparedatalist = [
+            ...this.cryptocomparedatalist,
+            ...newData
+          ];
         } else {
           this.cryptocomparedatalist = newData;
         }
 
-        
-        if (refetchOnClose) this.showLoader = false
-        if (!refetchOnClose) this.showInitLoader = false
-      } catch(e) {
-        if (refetchOnClose) this.showLoader = false
-        if(!refetchOnClose) this.showInitLoader = false
-        console.log(e)
+        if (refetchOnClose) this.showLoader = false;
+        if (!refetchOnClose) this.showInitLoader = false;
+      } catch (e) {
+        if (refetchOnClose) this.showLoader = false;
+        if (!refetchOnClose) this.showInitLoader = false;
+        console.log(e);
       }
     }
   }
