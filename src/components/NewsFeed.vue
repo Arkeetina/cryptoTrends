@@ -37,7 +37,12 @@
     <div
       v-if="loadingArticles"
     >
-      <p>Loading articles...</p>
+      <p class="news-loading-container">
+        <span style="margin-right: 5px;">Loading articles</span>
+        <img
+          src="../assets/loader-small.svg"
+        >
+      </p>
     </div>
   </div>
 </template>
@@ -61,6 +66,7 @@ export default {
   computed: {
     cryptocurName () {
       if (this.cryptocur.toLowerCase() === 'xrp') return "Ripple"
+      if (this.cryptocur.toLowerCase() === 'tronix') return "Tron"
       return this.cryptocur
     },
   },
@@ -77,10 +83,14 @@ export default {
         const setCoinQueryName = this.cryptocurName.toLowerCase().split(' ').join('-')
         const articlesData = await api.coinNewsApi.getTopNewsByCoin(setCoinQueryName, 'en')
         this.loadingArticles = false
-        this.articlesData = articlesData.slice(0, this.setArrLength(articlesData))
+        if (articlesData.length) {
+          this.articlesData = articlesData.slice(0, this.setArrLength(articlesData))
+        } else {
+          this.articlesData = []
+        }
+        
       } catch(e) {
         this.loadingArticles = false
-        console.log(e);
       }
     },
   },
@@ -89,6 +99,11 @@ export default {
 </script>
 
 <style lang="scss">
+
+.news-loading-container {
+  display: flex;
+  margin: 0;
+}
 
 .news-img-container {
   padding: 5px;

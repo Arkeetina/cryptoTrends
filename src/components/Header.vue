@@ -12,6 +12,7 @@
         >
           CryptoTrends
         </p>
+        <span class="header-subtitle">beta</span>
       </div>
 
       <vue-autosuggest
@@ -25,8 +26,16 @@
 </template>
 
 <style scroped lang="scss">
+  @import "../assets/settings.scss";
+
   #autosuggest {
     align-self: center;
+  }
+
+  .header-subtitle {
+    font-size: 14px;
+    margin-left: 2px;
+    font-style: italic;
   }
 
   .header-title {
@@ -49,7 +58,7 @@
   .header-container {
     width: 100%;
     top: 0;
-    background-color: #f8f8f8;
+    background-color: $off-white;
     color: #000;
     position: fixed;
     height: 80px;
@@ -141,8 +150,11 @@
         margin: 15px 0;
       }
 
-      .header-title {
+      .header-subtitle {
         margin-bottom: 5px;
+      }
+
+      .header-title {
         font-size: 30px;
       }
 

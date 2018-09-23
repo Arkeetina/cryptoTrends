@@ -67,6 +67,10 @@
     color: green;
   }
 
+  .back {
+    color: #000;
+  }
+
   .red {
     color: red;
   }
@@ -102,7 +106,7 @@ export default {
       coinPriceData: {
         marketcap: '',
         price: '',
-        change24: ''
+        change24: '',
       },
       showPriceLoader: false,
     }
@@ -112,8 +116,8 @@ export default {
     change24Class: {
       get() {
         if (this.coinPriceData.change24.indexOf('-') !== -1) return 'red'
-        if (this.coinPriceData.change24.indexOf('-') === -1) return 'green'
-        return ''
+        if (this.coinPriceData.change24.indexOf('-') === -1 && this.coinPriceData.change24) return 'green'
+        return 'black'
       }
     }
   },
@@ -140,8 +144,10 @@ export default {
         }
 
       } catch(e) {
-        this.showPriceLoader = false
-        console.log(e)
+        this.coinPriceData.showPriceLoader = false
+        this.coinPriceData.marketcap = 'Failed to load'
+        this.coinPriceData.price = 'Failed to load'
+        this.coinPriceData.change24 = 'Failed to load'
       }
     },
   },

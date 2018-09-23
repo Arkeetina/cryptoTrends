@@ -90,15 +90,15 @@
   flex-direction: column;
 }
 
-.cross-button {
-  font-size: 18px;
-  color: white;
-  font-weight: 500;
-}
+// .back-button {
+//   font-size: 18px;
+//   color: white;
+//   font-weight: 300;
+// }
 
-.cross-button:hover {
-  cursor: pointer;
-}
+// .back-button:hover {
+//   cursor: pointer;
+// }
 
 .card-main-section {
   border: 1px solid #413e7e;
@@ -115,7 +115,7 @@
 
 .crypto-card-container {
   overflow-y: visible;
-  padding: 30px;
+  padding: 50px;
   display: flex;
   background-color: #fff;
 }
@@ -177,12 +177,15 @@
 
 .inner-card-height {
   min-height: 562px;
-  margin-top: 40px;
+  // margin-top: 40px;
 }
 
 @media  (max-width:480px) {
-  .inner-card-height {
-    margin-top: 20px;
+  // .inner-card-height {
+  //   margin-top: 20px;
+  // }
+  .crypto-card-container {
+    padding: 30px;
   }
 
   .backside-icon-container {

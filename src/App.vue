@@ -33,7 +33,6 @@
         :cardcolor="cryptoCoin.cardcolor"
         :singleitem="singleItem"
       />
-
     </div>
 
     <div
@@ -43,58 +42,32 @@
       <img src="./assets/loader.svg">
     </div>
 
-
     <div
-      v-if="!showInitLoader && !showLoader && !singleItem"
-      class="load-more-button-container"
+      v-if="singleItem"
+      style="color: #fff"
+      class="load-more"
+      @click="loadCryptoData"
     >
-      <div
-        v-if="showButtonLoader && !singleItem"
-        class="load-more"
-      >
-        <span>Loading</span>
-        <img
-          style="margin-left: 5px;"
-          src="./assets/loader-small.svg"
-        >
-      </div>
-
-      <div
-        v-if="singleItem"
-        class="load-more"
-        @click="loadCryptoData"
-      >
-        <p class="cross-button">Load full list</p>
-      </div>
-
-      <div
-        v-if="!showButtonLoader && !singleItem"
-        class="load-more"
-        @click="loadMoreCoins()"
-      >
-        <p
-          class="load-more-button"
-        >
-          Load next 10 coins
-        </p>
-      </div>
-
+      <i class="fas fa-arrow-left" />
+      <span>Back to full list</span>
     </div>
+
+    <LoadButton
+      :showbuttonloader="showButtonLoader"
+      :singleitem="singleItem"
+      :showloader="showLoader"
+      :showinitloader="showInitLoader"
+      @loadmorecoins="loadMoreCoins()"
+    />
   </div>
 </template>
 
 <style lang="scss">
+
+@import "./assets/settings.scss";
+
 body {
   margin: 0;
-}
-
-.load-more {
-  border: 0;
-  cursor: pointer;
-  box-shadow: 1px #000;
-  display: flex;
-  font-size: 18px;
-  justify-content: center;
 }
 
 .load-more-button {
@@ -108,15 +81,24 @@ body {
 }
 
 .load-more-button-container {
-  background-color: #f8f8f8;
+  background-color: $off-white;
   padding: 15px 0;
   bottom: 0;
-  border-top: 1px solid #413e7e;
+}
+
+.load-more {
+  border: 0;
+  cursor: pointer;
+  font-weight: 300;
+  box-shadow: 1px #000;
+  display: flex;
+  font-size: 18px;
+  justify-content: center;
 }
 
 .loader-container {
   display: flex;
-  background-color: #413e7e;
+  background-color: $dark-purple;
   height: 100vh;
   justify-content: center;
 }
@@ -125,8 +107,8 @@ body {
   font-family: "Avenir", Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  color: #2c3e50;
-  background-color: #726cda;
+  // color: #2c3e50;
+  background-color: $light-purple;
 }
 
 .coins-list-section {
@@ -138,33 +120,33 @@ body {
 
 .coins-list-section-single-item {
   margin-top: 80px;
-  display: grid;
-  height: 100%;
-  grid-template-columns: 1fr;
+  display: flex;
+  flex-direction: column;
 }
 
 .dark-purple {
-  background-color: #413e7e;
+  background-color: $dark-purple;
 }
 
 .light-purple {
-  background-color: #726cda;
+  background-color: $light-purple;
 }
 
-@media (max-width: 860px) {
+@media (max-width: 960px) {
   .coins-list-section {
     display: flex;
     flex-direction: column;
   }
 
-  .coins-list-section-single-item {
-    display: flex;
-    flex-direction: column;
-  }
+
 }
 
 @media (max-width: 480px) {
   .coins-list-section {
+    margin-top: 120px;
+  }
+
+  .coins-list-section-single-item {
     margin-top: 120px;
   }
 }
@@ -173,7 +155,7 @@ body {
 <script>
 import CryptoCard from "./components/CryptoCard.vue";
 import Header from "./components/Header";
-import Footer from "./components/Footer";
+import LoadButton from "./components/LoadButton";
 import api from "./api/api";
 
 const cryptoComparaBaseUrl = "https://cryptocompare.com";
@@ -183,7 +165,7 @@ export default {
   components: {
     CryptoCard,
     Header,
-    Footer
+    LoadButton,
   },
   data() {
     return {
@@ -210,25 +192,6 @@ export default {
     this.loadCoinNames();
   },
   methods: {
-    // async flipAllCoins() {
-    //   this.cryptocomparedatalist = this.cryptocomparedatalist.map(coin => {
-    //     const coinObj = {
-    //       ...coin,
-    //       showbackside: true
-    //     };
-    //     return coinObj;
-    //   });
-
-    //   await this.$nextTick();
-    //   this.cryptocomparedatalist = this.cryptocomparedatalist.map(coin => {
-    //     const coinObj = {
-    //       ...coin,
-    //       showbackside: false
-    //     };
-    //     return coinObj;
-    //   });
-    // },
-
     filterSelectedCoin(coin) {
       const coinItemSelected = this.cryptocomparedatalist.filter(
         coinItem => coinItem.symbol === coin
@@ -242,7 +205,7 @@ export default {
     },
 
     setCardBackgroundColor(index) {
-      let currIndex = index + this.pageNumb * 10;
+      let currIndex = index + this.pageNumb * 8;
 
       if ((currIndex + 1) % 4 === 0 || currIndex % 4 === 0) {
         return "dark-purple";
@@ -260,7 +223,7 @@ export default {
     async loadCoinNames() {
       try {
         const cryptoCompareUrl =
-          "https://min-api.cryptocompare.com/data/all/coinlist";
+          'https://min-api.cryptocompare.com/data/all/coinlist';
         const options = { method: "GET" };
         const coinNameList = await api.startFetchJsonData(
           cryptoCompareUrl,
@@ -277,6 +240,7 @@ export default {
         this.coinsNameList = list;
       } catch (e) {
         console.log(e);
+        this.errorMessage = 'Failed to load coin information, click reload to reload coin information'
         this.coinsNameList = [];
       }
     },
@@ -308,13 +272,17 @@ export default {
         this.showLoader = false;
       } catch (e) {
         this.showLoader = false;
+        this.errorMessage = 'Failed to load coin information, click reload to reload coin information'
         console.log(e);
       }
     },
 
-    async loadCryptoData(refetchOnClose = false) {
+    async loadCryptoData(nonInitFetch = false) {
       try {
-        if (refetchOnClose) this.showLoader = true;
+        if (nonInitFetch) {
+          this.showLoader = true;
+          this.cryptocomparedatalist = [];
+        }
         const cryptoCompareUrl = `https://min-api.cryptocompare.com/data/top/totalvol?limit=10&tsym=USD&page=${
           this.pageNumb
         }`;
@@ -337,7 +305,7 @@ export default {
           return coinObj;
         });
 
-        if (this.cryptocomparedatalist.length && !refetchOnClose) {
+        if (this.cryptocomparedatalist.length && !nonInitFetch) {
           this.cryptocomparedatalist = [
             ...this.cryptocomparedatalist,
             ...newData
@@ -346,11 +314,12 @@ export default {
           this.cryptocomparedatalist = newData;
         }
 
-        if (refetchOnClose) this.showLoader = false;
-        if (!refetchOnClose) this.showInitLoader = false;
+        if (nonInitFetch) this.showLoader = false;
+        if (!nonInitFetch) this.showInitLoader = false;
       } catch (e) {
-        if (refetchOnClose) this.showLoader = false;
-        if (!refetchOnClose) this.showInitLoader = false;
+        if (nonInitFetch) this.showLoader = false;
+        if (!nonInitFetch) this.showInitLoader = false;
+        this.errorMessage = 'Failed to load coin information, click reload to reload coin information'
         console.log(e);
       }
     }
