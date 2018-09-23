@@ -48,7 +48,7 @@
       class="load-more"
       @click="loadCryptoData"
     >
-      <i class="fas fa-arrow-left" />
+      <i class="fas fa-arrow-left back-arrow" />
       <span>Back to full list</span>
     </div>
 
@@ -63,7 +63,6 @@
 </template>
 
 <style lang="scss">
-
 @import "./assets/settings.scss";
 
 body {
@@ -72,7 +71,7 @@ body {
 
 .load-more-button {
   font-weight: 300;
-  background-color: none;
+  background-color: transparent;
   border: none;
   margin: 0;
 }
@@ -90,10 +89,13 @@ body {
   border: 0;
   cursor: pointer;
   font-weight: 300;
-  box-shadow: 1px #000;
   display: flex;
   font-size: 18px;
   justify-content: center;
+}
+
+.load-more:hover {
+  opacity: 0.4;
 }
 
 .loader-container {
@@ -101,6 +103,12 @@ body {
   background-color: $dark-purple;
   height: 100vh;
   justify-content: center;
+}
+
+.load-more i {
+  position: relative;
+  top: 3px;
+  right: 7px;
 }
 
 #app {
@@ -137,8 +145,6 @@ body {
     display: flex;
     flex-direction: column;
   }
-
-
 }
 
 @media (max-width: 480px) {
@@ -165,7 +171,7 @@ export default {
   components: {
     CryptoCard,
     Header,
-    LoadButton,
+    LoadButton
   },
   data() {
     return {
@@ -223,7 +229,7 @@ export default {
     async loadCoinNames() {
       try {
         const cryptoCompareUrl =
-          'https://min-api.cryptocompare.com/data/all/coinlist';
+          "https://min-api.cryptocompare.com/data/all/coinlist";
         const options = { method: "GET" };
         const coinNameList = await api.startFetchJsonData(
           cryptoCompareUrl,
@@ -240,7 +246,8 @@ export default {
         this.coinsNameList = list;
       } catch (e) {
         console.log(e);
-        this.errorMessage = 'Failed to load coin information, click reload to reload coin information'
+        this.errorMessage =
+          "Failed to load coin information, click reload to reload coin information";
         this.coinsNameList = [];
       }
     },
@@ -272,7 +279,8 @@ export default {
         this.showLoader = false;
       } catch (e) {
         this.showLoader = false;
-        this.errorMessage = 'Failed to load coin information, click reload to reload coin information'
+        this.errorMessage =
+          "Failed to load coin information, click reload to reload coin information";
         console.log(e);
       }
     },
@@ -319,7 +327,8 @@ export default {
       } catch (e) {
         if (nonInitFetch) this.showLoader = false;
         if (!nonInitFetch) this.showInitLoader = false;
-        this.errorMessage = 'Failed to load coin information, click reload to reload coin information'
+        this.errorMessage =
+          "Failed to load coin information, click reload to reload coin information";
         console.log(e);
       }
     }
