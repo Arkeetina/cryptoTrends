@@ -49,7 +49,7 @@
       @click="loadCryptoData"
     >
       <i class="fas fa-arrow-left back-arrow" />
-      <span>Back to full list</span>
+      <span class="loadmore-back-label">Back to full list</span>
     </div>
 
     <LoadButton
@@ -83,6 +83,7 @@ body {
   background-color: $off-white;
   padding: 15px 0;
   bottom: 0;
+  position: relative;
 }
 
 .load-more {
@@ -105,10 +106,18 @@ body {
   justify-content: center;
 }
 
-.load-more i {
+.loadmore-back-label {
   position: relative;
-  top: 3px;
-  right: 7px;
+  bottom: 3px;
+  left: 7px;
+}
+
+.project-info {
+  color: #ffffff;
+  font-size: 7px;
+  right: 20px;
+  bottom: 58px;
+  position: absolute;
 }
 
 #app {
@@ -211,7 +220,7 @@ export default {
     },
 
     setCardBackgroundColor(index) {
-      let currIndex = index + this.pageNumb * 8;
+      let currIndex = index + this.pageNumb * 10;
 
       if ((currIndex + 1) % 4 === 0 || currIndex % 4 === 0) {
         return "dark-purple";

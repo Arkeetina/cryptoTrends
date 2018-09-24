@@ -25,34 +25,29 @@
         Load more coins
       </p>
     </div>
+    <div class="project-info">Built by Katerina Bezlepkina with contribution from Janko Prester. v0.1.0</div>
   </div>
 </template>
 
 <style scoped lang="scss">
-
 @import "../assets/settings.scss";
-
-
 </style>
 
 <script>
-
 export default {
-  name: 'LoadButton',
+  name: "LoadButton",
   props: {
     showbuttonloader: { type: Boolean, required: true },
     singleitem: { type: Boolean, required: true },
     showloader: { type: Boolean, required: true },
-    showinitloader: { type: Boolean, required: true },
+    showinitloader: { type: Boolean, required: true }
   },
-  computed: {
-  },
-  created() {
-  },
+  computed: {},
+  created() {},
   methods: {
     loadMoreCoins() {
-      this.$emit('loadmorecoins');
+      this.$emit("loadmorecoins");
     }
-  },
-}
+  }
+};
 </script>
