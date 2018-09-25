@@ -114,10 +114,14 @@ body {
 
 .project-info {
   color: #ffffff;
-  font-size: 7px;
+  font-size: 8px;
   right: 20px;
   bottom: 58px;
   position: absolute;
+}
+
+.project-info a {
+  color: #ffffff;
 }
 
 #app {

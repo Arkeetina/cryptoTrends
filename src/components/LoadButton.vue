@@ -25,7 +25,7 @@
         Load more coins
       </p>
     </div>
-    <div class="project-info">Built by Katerina Bezlepkina with contribution from Janko Prester. v0.1.0</div>
+    <div class="project-info">Built by <a href="http://www.katerina-bezlepkina.com/">Katerina Bezlepkina </a> with contributions from <a href="https://www.jankoprester.com">Janko Prester </a>. v0.1.0</div>
   </div>
 </template>
 
