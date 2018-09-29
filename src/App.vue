@@ -258,7 +258,6 @@ export default {
         });
         this.coinsNameList = list;
       } catch (e) {
-        console.log(e);
         this.errorMessage =
           "Failed to load coin information, click reload to reload coin information";
         this.coinsNameList = [];
@@ -294,7 +293,6 @@ export default {
         this.showLoader = false;
         this.errorMessage =
           "Failed to load coin information, click reload to reload coin information";
-        console.log(e);
       }
     },
 
@@ -342,7 +340,6 @@ export default {
         if (!nonInitFetch) this.showInitLoader = false;
         this.errorMessage =
           "Failed to load coin information, click reload to reload coin information";
-        console.log(e);
       }
     }
   }
