@@ -33,6 +33,15 @@
         :cardcolor="cryptoCoin.cardcolor"
         :singleitem="singleItem"
       />
+      <div
+        v-if="singleItem"
+        style="color: #fff; margin: 15px 0;"
+        class="load-more"
+        @click="loadCryptoData"
+      >
+        <i class="fas fa-arrow-left back-arrow" />
+        <span class="loadmore-back-label">Back to full list</span>
+      </div>
     </div>
 
     <div
@@ -42,15 +51,7 @@
       <img src="./assets/loader.svg">
     </div>
 
-    <div
-      v-if="singleItem"
-      style="color: #fff"
-      class="load-more"
-      @click="loadCryptoData"
-    >
-      <i class="fas fa-arrow-left back-arrow" />
-      <span class="loadmore-back-label">Back to full list</span>
-    </div>
+
 
     <LoadButton
       :showbuttonloader="showButtonLoader"
