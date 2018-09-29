@@ -9,7 +9,7 @@ Vue.js app for cryptocurrency trends/news
 yarn install or npm install
 ```
 ## Running
-3. 
+3. To run dev:
 ```
 npm run serve or yarn serve
 ```
