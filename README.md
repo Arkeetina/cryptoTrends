@@ -13,3 +13,6 @@ yarn install or npm install
 ```
 npm run serve or yarn serve
 ```
+## Demo
+
+https://crypto-trends.netlify.com/
