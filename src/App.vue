@@ -35,12 +35,14 @@
       />
       <div
         v-if="singleItem"
-        style="color: #fff; margin: 15px 0;"
         class="load-more"
+        style="padding: 40px 0;"
         @click="loadCryptoData"
       >
         <i class="fas fa-arrow-left back-arrow" />
-        <span class="loadmore-back-label">Back to full list</span>
+        <span
+          class="load-more-back-label"
+        >Back to full list</span>
       </div>
     </div>
 
@@ -89,6 +91,8 @@ body {
 
 .load-more {
   border: 0;
+  color: $dark-grey;
+  margin: 15px 0;
   cursor: pointer;
   font-weight: 300;
   display: flex;
@@ -102,19 +106,19 @@ body {
 
 .loader-container {
   display: flex;
-  background-color: $dark-purple;
+  background-color: $off-white;
   height: 100vh;
   justify-content: center;
 }
 
-.loadmore-back-label {
+.load-more-back-label {
   position: relative;
   bottom: 3px;
   left: 7px;
 }
 
 .project-info {
-  color: #ffffff;
+  color: $dark-grey;
   font-size: 8px;
   right: 20px;
   bottom: 58px;
@@ -122,36 +126,38 @@ body {
 }
 
 .project-info a {
-  color: #ffffff;
+  color: $dark-grey;
 }
 
 #app {
   font-family: "Avenir", Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  // color: #2c3e50;
-  background-color: $light-purple;
+  background-color: $light-grey;
 }
 
 .coins-list-section {
   margin-top: 80px;
-  // margin-bottom: 50px;
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 50vw 50vw;
+  background-color: $mid-grey;
+  background-image: repeating-linear-gradient(45deg, transparent, transparent 35px, $light-grey 35px, $light-grey 70px);
 }
 
 .coins-list-section-single-item {
   margin-top: 80px;
   display: flex;
   flex-direction: column;
+  background-color: $mid-grey;
+  background-image: repeating-linear-gradient(45deg, transparent, transparent 35px, $light-grey 35px, $light-grey 70px);
 }
 
-.dark-purple {
-  background-color: $dark-purple;
-}
+.dark-grey {
+  background-color: transparent;
+  }
 
-.light-purple {
-  background-color: $light-purple;
+.light-grey {
+  background-color: transparent;
 }
 
 @media (max-width: 960px) {
@@ -228,9 +234,9 @@ export default {
       let currIndex = index + this.pageNumb * 10;
 
       if ((currIndex + 1) % 4 === 0 || currIndex % 4 === 0) {
-        return "dark-purple";
+        return "dark-grey";
       }
-      return "light-purple";
+      return "light-grey";
     },
 
     async loadMoreCoins() {

@@ -99,6 +99,7 @@ export default {
 </script>
 
 <style lang="scss">
+@import "../assets/settings.scss";
 
 .news-loading-container {
   display: flex;
@@ -110,8 +111,9 @@ export default {
 }
 .newsfeed-link {
   text-decoration: none;
-  font-weight: 500;
-  color: #413e7e;
+  font-weight: 700;
+  color: $dark-grey;
+  
 }
 .newsfeed-link:hover {
   text-decoration: underline;

@@ -54,7 +54,7 @@
           </div>
           <p
             class="sub-title"
-            style="font-size: 18px;margin: 15px 0 10px 0;"
+            style="font-size: 18px;margin: 15px 0 10px 0;text-align: center;"
           >
             Latest headlines...
           </p>
@@ -74,6 +74,8 @@
 </template>
 
 <style lang="scss">
+@import "../assets/settings.scss";
+
 .crypto-logo:hover {
   cursor: pointer;
 }
@@ -90,23 +92,6 @@
   flex-direction: column;
 }
 
-// .back-button {
-//   font-size: 18px;
-//   color: white;
-//   font-weight: 300;
-// }
-
-// .back-button:hover {
-//   cursor: pointer;
-// }
-
-.card-main-section {
-  border: 1px solid #413e7e;
-  box-shadow: 1px 1px 1px #0000003b;
-  background-color: #fff;
-  border-radius: 5px;
-  width: 380px;
-}
 
 .rate-information {
   margin-left: 40px;
@@ -115,7 +100,7 @@
 
 .crypto-card-container {
   overflow-y: visible;
-  padding: 50px;
+  padding: 70px;
   display: flex;
   background-color: #fff;
 }
@@ -128,18 +113,38 @@
   justify-content: flex-start;
 }
 
+.card-main-section {
+  box-shadow: 4px 8px 18px 1px #0000003b;
+  background-color: #fff;
+  border-radius: 1px;
+  width: 33vw;
+  @media  (max-width:960px) {
+    width: 70vw;
+  }
+  @media  (max-width:480px) {
+    width: 80vw;
+  }
+}
+
 .backside-icon-container {
   justify-content: center;
   align-items: center;
   flex-direction: column;
   display: flex;
-  width: 380px;
+  width: 33vw;
   min-height: 562px;
   background-color: #fff;
-  border: 1px solid #413e7e;
-  box-shadow: 1px 1px 1px #0000003b;
+  box-shadow: 4px 8px 18px 1px #0000003b;
   border-radius: 2px;
+  @media  (max-width:960px) {
+    width: 70vw;
+  }
+  @media  (max-width:480px) {
+    width: 80vw;
+  }
+
 }
+
 .backside-icon-container:hover {
   cursor: pointer;
 }
@@ -152,18 +157,19 @@
 .crypto-title {
   font-weight: 300;
   font-size: 24px;
-  color: #413e7e;
+  color: $dark-grey;
 }
 
 .name-section {
   display: flex;
   flex-wrap: nowrap;
-  justify-content: space-between;
+  justify-content: center;
 }
 
 .price-info-container {
   display: flex;
   align-items: center;
+  justify-content: center;
   flex-wrap: nowrap;
 }
 
@@ -181,9 +187,6 @@
 }
 
 @media  (max-width:480px) {
-  // .inner-card-height {
-  //   margin-top: 20px;
-  // }
   .crypto-card-container {
     padding: 30px;
   }
@@ -202,10 +205,7 @@
     font-size: 13px;
   }
 
-  .card-main-section  {
-    width: 355px;
-    height: 550px;
-  }
+
 }
 </style>
 

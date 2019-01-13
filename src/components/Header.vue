@@ -45,6 +45,10 @@
     margin-bottom: -7px;
   }
 
+  .header-title:hover {
+    color: $dark-grey;
+  }
+
   .header-title-inner {
     font-size: 10px;
     font-weight: 300;
@@ -63,7 +67,7 @@
     position: fixed;
     height: 80px;
     z-index: 100;
-    box-shadow: 1px 1px #000;
+    border-bottom: 1px solid $mid-grey;
   }
 
   .header-items {
@@ -80,7 +84,7 @@
       display: block;
       font-family: 'Avenir', Helvetica, Arial, sans-serif;
       font-size: 16px;
-      border: 1px solid #616161;
+      border: 1px solid $mid-grey;
       padding: 7px;
       width: 200px;
       box-sizing: border-box;
@@ -218,7 +222,8 @@ export default {
       }
  
       const filteredData = this.coinsList[0].data.filter(option => {
-        return option.toLowerCase().indexOf(text.toLowerCase()) > -1;
+        return option.toLowerCase().startsWith(text.toLowerCase())
+        // return option.toLowerCase().indexOf(text.toLowerCase()) > -1;
       });
  
       // Store data in one property, and filtered in another
