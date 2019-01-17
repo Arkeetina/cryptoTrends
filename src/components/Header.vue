@@ -220,14 +220,17 @@ export default {
       if (text === '' && this.itemslength === 1) {
         this.$emit('reloadcoins', true);
       }
+
+      const exactMatch = this.coinsList[0].data.filter(option => {
+        return option.toLowerCase() === text.toLowerCase().trim()
+      }); 
+      
  
       const filteredData = this.coinsList[0].data.filter(option => {
         return option.toLowerCase().startsWith(text.toLowerCase())
-        // return option.toLowerCase().indexOf(text.toLowerCase()) > -1;
-      });
- 
-      // Store data in one property, and filtered in another
-      this.filteredOptions = [{ data: filteredData }];
+      }); 
+
+      this.filteredOptions = [{ data: [...exactMatch, ...filteredData] }];
     },
 
     onSelected(item) {
