@@ -258,9 +258,6 @@ export default {
     flipCard() {
       this.showBackside = !this.showBackside
     },
-    // onCloseClick() {
-    //   this.$emit('closecoin', true);
-    // }
   },
 }
 </script>
