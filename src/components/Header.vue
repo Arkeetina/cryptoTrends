@@ -14,13 +14,16 @@
         </p>
         <span class="header-subtitle">beta</span>
       </div>
-
       <vue-autosuggest
         :suggestions="filteredOptions"
-        :on-selected="onSelected"
-        :limit="10"
         :input-props="inputProps"
-      />
+        :limit="10"
+        @input="onInputChange"
+        @selected="onSelected"
+      >  
+        <template slot-scope="{ suggestion }"><div class="item">{{ suggestion.item }}</div></template>
+      </vue-autosuggest>
+      
     </div>
   </div>
 </template>
@@ -77,8 +80,7 @@
     padding: 0 15px;
   }
 
-
-  #autosuggest__input {
+    #autosuggest__input {
       outline: none;
       position: relative;
       display: block;
@@ -123,7 +125,7 @@
       margin: 0;
     }
     
-    .autosuggest__results .autosuggest__results_item {
+    .item {
       cursor: pointer;
       padding: 15px;
     }
@@ -140,12 +142,20 @@
       border-top: 1px solid lightgray;
     }
     
-    .autosuggest__results .autosuggest__results_item:active,
-    .autosuggest__results .autosuggest__results_item:hover,
-    .autosuggest__results .autosuggest__results_item:focus,
-    .autosuggest__results .autosuggest__results_item.autosuggest__results_item-highlighted {
+    .item:active,
+    .item:hover,
+    .item:focus,
+    .item.autosuggest__results_item-highlighted {
       background-color: #ddd;
     }
+
+
+
+
+    
+
+    
+
 
   @media (max-width:480px) {
       .header-items {
@@ -213,6 +223,7 @@ export default {
     },
 
     onInputChange(text, oldText) {
+      
       if (text === null) {
         return;
       }
